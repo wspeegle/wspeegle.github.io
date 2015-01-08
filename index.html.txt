@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1> William Speegle index page </h1>
+<p>Stuff goes here </p>
+</body>
+</html>
