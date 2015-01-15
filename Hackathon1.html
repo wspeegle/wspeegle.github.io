@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="200" height=”200"
+        style="border:1px solid #FFFFFF;">
+    Your browser does not support the canvas element.
+</canvas>
+
+<script>
+    var canvas = document.getElementById("myCanvas");  // find the canvas element
+    var ctx = canvas.getContext("2d");					// drawing object ctx
+    ctx.beginPath();
+    ctx.moveTo(75,0);
+    ctx.lineTo(125,0);
+    ctx.lineTo(175,50);
+    ctx.lineTo(175,100);
+    ctx.lineTo(125,150);
+    ctx.lineTo(75,150);
+    ctx.lineTo(25,100);
+    ctx.lineTo(25,50);
+    ctx.lineTo(75,0);
+    ctx.stroke();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.moveTo(75,5);
+    ctx.lineTo(125,5);
+    ctx.lineTo(170,50);
+    ctx.lineTo(170,100);
+    ctx.lineTo(125,145);
+    ctx.lineTo(75,145);
+    ctx.lineTo(30,100);
+    ctx.lineTo(30,50);
+    ctx.lineTo(75,5);
+
+    ctx.stroke();
+    ctx.fillStyle = "#FF0000";
+    ctx.fill();
+    ctx.closePath();
+
+
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = "50px Helvetica ";
+    ctx.fillText("STOP", 30,90);
+
+
+</script>
+
+</body>
