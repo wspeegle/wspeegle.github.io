@@ -75,12 +75,14 @@
            // vy += g; // gravity
 
             // update position
-            if(x+vx < canvas.width)
+            if(x+vx < canvas.width && y-radius >radius)
                 x += vx;
             else if ( y <canvas.height&& y-radius>0)
                 y -= 10;
-            if(y-radius == 0 && x+vx > canvas.width )
-                vx = -vx;
+            else if(x>0 && y-radius == 0)
+                x -= 5;
+            else if(x == radius && y < canvas.height)
+                y+= 10;
 
 
 
