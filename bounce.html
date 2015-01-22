@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ball Action </title>
+
+    <style type="text/css">
+        canvas { border: 3px solid black; }
+        body { background-color: #666; }
+        #canvas {background-color: #ccc;}
+    </style>
+
+    <script type="text/javascript">
+
+        //BEGIN LIBRARY CODE
+        var canvas;
+        var context;
+
+        // physical variables
+        var g = 2; 		// gravity
+        var fac = 0.8; 		// velocity reduction factor per bounce
+        var radius = 20; 	// ball radius
+        var color = "#FF1C0A";
+
+        // initialise position and velocity of ball
+        var x = 50;
+        var y = 50;
+        var vx = 2;
+        var vy = 0;
+
+        // ensure that code does not run before page has loaded
+        window.onload = init;
+
+        function init()
+        {
+            canvas = document.getElementById('canvas');
+            context = canvas.getContext('2d');
+
+            return setInterval( update, 1000/60 ); // 60 frames per second
+        }
+
+        function update()
+        {
+            // update velocity
+            vy += g; // gravity
+
+            // update position
+            x += vx;
+            y += vy;
+
+            // handle bouncing
+            if (y > canvas.height - radius)
+            {
+                y = canvas.height - radius;
+                vy *= -fac;
+            }
+
+            // wrap around
+            if(x > canvas.width + radius)
+            {
+                x = -radius;
+            }
+            drawBall();
+        }
+
+        function drawBall()
+        {
+            with(context)
+            {
+                clearRect(0, 0, canvas.width, canvas.height);
+                fillStyle = color;
+                beginPath();
+                arc(x, y, radius, 0, 2*Math.PI, true);
+                closePath();
+                fill();
+            }
+        };
+    </script>
+</head>
+
+<!-- HERE we add an explicit call to the draw() function -->
+<body onload="init()">
+<canvas id="canvas" width="700" height="500">
+    Your browser does not support the canvas element.
+</canvas>
+</body>
+</html>
+

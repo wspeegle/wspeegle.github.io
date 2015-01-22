@@ -18,7 +18,7 @@
         var H = canvas.height = window.innerHeight;
 
         // Velocity x
-        var vx = 0;
+        var vx = 1;
         // Velocity y
         var vy = (Math.random() * -15) - 5;
 
@@ -58,6 +58,7 @@
             ctx.clearRect(0, 0, W, H);
 
             vy += gravity;
+
 
             ball.x += vx;
             ball.y += vy;
