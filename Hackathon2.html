@@ -25,10 +25,14 @@
         var color = "#FF1C0A";
 
         // initialise position and velocity of ball
-        var x = radius;
-        var y = 500 - radius    ;
-        var vx = 2;
+        var x = 0;
+        var y = 500 - radius;
+        var vx = 5;
         var vy = 0;
+        var buttonToggle = true;
+        var sliding = false;
+        var downKey = false;
+
 
         // ensure that code does not run before page has loaded
         window.onload = init;
@@ -37,70 +41,138 @@
         {
             canvas = document.getElementById('canvas');
             context = canvas.getContext('2d');
-
-            return setInterval( climbUpdate, 1000/60 ); // 60 frames per second
+            window.addEventListener('keydown', onKeyDown, true);
+            return setInterval( update, 1000/30 ); // 60 frames per second
         }
 
-        function wrap()
+        function toggle()
         {
-            return setInterval(wrapUpdate(), 1000/60);
+            switch(buttonToggle)
+            {
+                case true:
+                    buttonToggle = false;
+                    break;
+                case false:
+                    buttonToggle= true;
+                    break;
+            }
         }
         function update()
         {
-            // update velocity
-            vy += g; // gravity
 
-            // update position
-            x += vx;
-            y += vy;
+                    if(!sliding) {
+                        //wrapping with gravity
+                        if (buttonToggle) {
+                            // update velocity
+                            vy += g; // gravity
 
-            // handle bouncing
-            if (y > canvas.height - radius)
+                            // update position
+                            x += vx;
+                            y += vy;
+
+                            // handle bouncing
+                            if (y > canvas.height - radius) {
+                                y = canvas.height - radius;
+                                vy *= -fac;
+                            }
+
+                            // wrap around
+                            if (x > canvas.width + radius) {
+                                x = -radius;
+                            }
+                        }
+                        //scrolling along the edge
+                        else {
+                            if (x + vx + radius <= canvas.width && y + radius == canvas.height)
+                                x += vx;
+                            else if (x + radius >= canvas.width && y - radius > 0)
+                                y -= 5;
+                            else if (x - radius > 0 && y - radius == 0)
+                                x -= 5;
+                            else
+                                y += 5;
+                        }
+                    }
+            else if(sliding)
+                    {
+
+
+                        if(x+vx+radius <= canvas.width && y+radius == canvas.height)
+                        {
+                            x+=vx;
+                        }
+                        else if(y-radius> 0 && y+radius <= canvas.height)
+                        {
+                            y += 1;
+                        }
+                        else if(x-radius >0 && y-radius ==0)
+                        {
+                            y+=.1;
+                        }
+
+                    }
+            if(downKey)
             {
-                y = canvas.height - radius;
-                vy *= -fac;
+                vy+=g;
+                y+=vy;
+                if(x+vx+radius<= canvas.width)
+                    x+=vx;
+                if (y > canvas.height - radius) {
+                    y = canvas.height - radius;
+                    vy *= -fac;
+                }
             }
 
-            // wrap around
-            if(x > canvas.width + radius)
+
+            //We are sliding
+
+
+                drawBall();
+        }
+        function slide()
+        {
+            switch(sliding)
             {
-                x = -radius;
+                case true:
+                    sliding = false;
+                    break;
+                case false:
+                    sliding = true;
+                    break;
             }
-            drawBall();
-
         }
-        function climbUpdate()
+        function onKeyDown(evt)
         {
-            // update velocity
-           // vy += g; // gravity
+            switch(evt.keyCode)
+            {
+                case 38:
+                        if(y-radius -10 >0)
+                            y-=10;
+                        else if(x-radius >0)
+                            x-=10;
+                    break;
+                case 37:
+                    x-=10;
+                    break;
+                case 40:
+                        downUpdate();
+                    break;
 
-            // update position
-            if(x+vx < canvas.width && y-radius >radius)
-                x += vx;
-            else if ( y <canvas.height&& y-radius>0)
-                y -= 10;
-            else if(x>0 && y-radius == 0)
-                x -= 5;
-            else if(x == radius && y < canvas.height)
-                y+= 10;
-
-
-
-
-
-
-
-            drawBall();
+            }
         }
-        function climb()
+
+        function downUpdate()
         {
-            if(y-radius > 0)
-            y -=10;
-
-            //if(y = radius && vx >0)
-            //vx = -vx;
+            switch(downKey)
+            {
+                case true:
+                    downKey = false;
+                    break;
+                case false:
+                    downKey = true;
+                    break;
+            }
         }
-
         function drawBall()
         {
             with(context)
@@ -126,8 +198,10 @@
 
 </canvas>
 <BR>
-<button onclick="update()"> Wrap </button>
-<button onclick="climb()"> Climb </button>
+
+    <button onclick="toggle()"> Toggle </button>
+    <button onclick ="slide()"> Sliding Mode</button>
+
 </body>
 </html>
 
