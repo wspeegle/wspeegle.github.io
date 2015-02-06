@@ -87,17 +87,46 @@ var Simulation = (function (Context) {
         normalVector = normalVector.normalise();
 
         var tangentVector = new vector((normalVector.getY() * -1), normalVector.getX());
-
+        if(ball1.getColour() == "#FF0000")
+        {
+            var ball1scalarNormal = redCo;
+        }
+        else if(ball1.getColour() == "#00FF00")
+        {
+            var ball1scalarNormal = blueCo;
+        }
+        else if(ball1.getColour() == "#0000FF")
+        {
+            var ball1scalarNormal = greenCo;
+        }
+        var ball1scalarNormal =  1;
         // create ball scalar normal direction.
-        var ball1scalarNormal =  normalVector.dot(ball1.velocity);
-        var ball2scalarNormal = normalVector.dot(ball2.velocity);
 
+
+
+
+        if(ball2.getColour() == "#FF0000")
+        {
+            var ball2scalarNormal = redCo;
+        }
+        else if(ball2.getColour() == "#00FF00")
+        {
+            var ball2scalarNormal = blueCo;
+        }
+        else if(ball2.getColour() == "#0000FF")
+        {
+            var ball2scalarNormal = greenCo;
+        }
+        else
+            var ball2scalarNormal =  1;
+        console.log("ball1 ", ball1scalarNormal);
+        console.log("ball 2", ball2scalarNormal);
         // create scalar velocity in the tagential direction.
         var ball1scalarTangential = tangentVector.dot(ball1.velocity);
         var ball2scalarTangential = tangentVector.dot(ball2.velocity);
 
-        var ball1ScalarNormalAfter = (ball1scalarNormal * (ball1.getMass() - ball2.getMass()) + 2 * ball2.getMass() * ball2scalarNormal) / (ball1.getMass() + ball2.getMass());
-        var ball2ScalarNormalAfter = (ball2scalarNormal * (ball2.getMass() - ball1.getMass()) + 2 * ball1.getMass() * ball1scalarNormal) / (ball1.getMass() + ball2.getMass());
+        var ball2ScalarNormalAfter = (ball2scalarNormal * (ball1.getMass() - ball2.getMass()) + 2 * ball2.getMass() * ball2scalarNormal) / (ball1.getMass() + ball2.getMass());
+        var ball1ScalarNormalAfter = (ball1scalarNormal * (ball2.getMass() - ball1.getMass()) + 2 * ball1.getMass() * ball1scalarNormal) / (ball1.getMass() + ball2.getMass());
 
         var ball1scalarNormalAfter_vector = normalVector.multiply(ball1ScalarNormalAfter); // ball1Scalar normal doesnt have multiply not a vector.
         var ball2scalarNormalAfter_vector = normalVector.multiply(ball2ScalarNormalAfter);
@@ -120,10 +149,10 @@ var Simulation = (function (Context) {
             ball2.collissionThreshold += 1;
         }
 
-        if(ball1.collissionThreshold %4 == 0 &&ball1.collissionThreshold >0 && ball1.collissionThreshold <13 ) {
+        if(ball1.collissionThreshold %4 == 0 &&ball1.collissionThreshold >0 && ball1.collissionThreshold <17 ) {
             ball1.colorPos += 1;
         }
-        if(ball2.collissionThreshold %4 ==0 && ball2.collissionThreshold >0 && ball2.collissionThreshold <13) {
+        if(ball2.collissionThreshold %4 ==0 && ball2.collissionThreshold >0 && ball2.collissionThreshold <17) {
             ball2.colorPos += 1;
         }
 
@@ -137,12 +166,12 @@ var Simulation = (function (Context) {
 
         var xPoint = (x1 * r2 + x2 * r1) / (r1 + r2);
         var yPoint = (y1 * r2 + y2 * r1) / (r1 + r2);
-        context.beginPath();
-        context.fillStyle = "blue";
+        //context.beginPath();
+        //context.fillStyle = "blue";
         //context.arc(xPoint, yPoint, r1, 0, Math.PI * 2, false);
         //context.fill();
-        context.drawImage(explosion, xPoint -120, yPoint-115);
-        context.closePath();
+        //context.drawImage(explosion, xPoint -120, yPoint-115);
+        //context.closePath();
         var c1 =colorArray[ball1.colorPos];
         var c2 = colorArray[ball2.colorPos];
         ball1.setColour(c1);

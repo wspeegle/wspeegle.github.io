@@ -2,7 +2,7 @@
 /*############################################################
  # Class is a ball object, only contains getters and setters #
  #############################################################*/
-var colorArray= ["#000000", "#00FF00", "#0000FF", "#CAE1FF"];
+var colorArray= ["#000000","#FF0000", "#00FF00", "#0000FF", "#CAE1FF"];
 
 var ball = (function (context) {
 
@@ -28,7 +28,7 @@ var ball = (function (context) {
 
         this.setRadius(inRadius);
         this.setMass(inMass);
-        this.setColour(inColour);
+        this.setColour("#000000");
         this.colorPos = 0;
         this.collissionThreshold = 0;
         this.clickedOn = false;
