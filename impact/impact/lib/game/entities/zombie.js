@@ -49,7 +49,7 @@ ig.module(
                 },
             check: function(other)
             {
-                other.receiveDamage(10, this);
+                this.receiveDamage(10, other);
             }
 
         });

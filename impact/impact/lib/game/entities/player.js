@@ -75,11 +75,11 @@ ig.module(
                 else if(this.rightWall)
                 {
                     this.friction = {x: 0, y: 600};
-                    if(ig.input.state('left'))
+                    if(ig.input.state('down'))
                     {
                         this.accel.y = accel;
                         this.flip = true;
-                    }else if(ig.input.state('right'))
+                    }else if(ig.input.state('up'))
                     {
                         this.accel.y = -accel;
                         this.flip = false;
@@ -87,15 +87,20 @@ ig.module(
                     else{
                         this.accel.y = 0;
                     }
-                    //jump
-                    if( ig.input.pressed('jump'))
+                    if(ig.input.pressed('left'))
                     {
-                        this.vel.x = -this.jump;
+                      // this.friction = {x: 600, y: 0};
+
+                        this.gravityFactor = 0.01;
+                        this.vel.x = -10 *this.jump;
+
                     }
+                    //jump
+
                     //set current animation, based on player speed
                     if(this.vel.x < 0)
                     {
-                        this.currentAnim = this.anims.jump;
+                        this.currentAnim = this.anims.rightIdle;
                     }else if(this.vel.x > 0)
                     {
                         this.currentAnim = this.anims.fall;
@@ -111,62 +116,124 @@ ig.module(
                     this.friction = {x: 600, y: 0};
                     if (ig.input.state('left')) {
                         this.accel.x = -accel;
-                        this.flip = true;
+                        this.flip = false;
                     } else if (ig.input.state('right')) {
                         this.accel.x = accel;
-                        this.flip = false;
+                        this.flip = true;
                     }
                     else {
                         this.accel.x = 0;
                     }
                     //jump
-                    if (this.standing && ig.input.pressed('jump')) {
-                        this.vel.y = -this.jump;
+                    if (ig.input.pressed('down')) {
+                        this.vel.y = this.jump;
                     }
                     //set current animation, based on player speed
                     if (this.vel.y < 0) {
-                        this.currentAnim = this.anims.jump;
+                        this.currentAnim = this.anims.upperIdle;
                     } else if (this.vel.y > 0) {
                         this.currentAnim = this.anims.fall;
                     } else if (this.vel.x != 0) {
-                        this.currentAnim = this.anims.run;
+                        this.currentAnim = this.anims.upperRun;
                     } else {
-                        this.currentAnim = this.anims.idle;
+                        this.currentAnim = this.anims.upperIdle;
                     }
                     this.currentAnim.flip.x = this.flip;
+                }else if(this.leftWall)
+                {
+                    this.friction = {x: 0, y: 600};
+                    if(ig.input.state('up'))
+                    {
+                        this.accel.y = -accel;
+                        this.flip = true;
+                    }else if(ig.input.state('down'))
+                    {
+                        this.accel.y = accel;
+                        this.flip = false;
+                    }
+                    else{
+                        this.accel.y = 0;
+                    }
+                    //jump
+                    if( ig.input.pressed('right'))
+                    {
+                        this.vel.x = this.jump;
+                    }
+                    //set current animation, based on player speed
+                    if(this.vel.x < 0)
+                    {
+                        this.currentAnim = this.anims.leftIdle;
+                    }else if(this.vel.x > 0)
+                    {
+                        this.currentAnim = this.anims.fall;
+                    }else if(this.vel.y != 0)
+                    {
+                        this.currentAnim = this.anims.leftRun;
+                    }else
+                    {
+                        this.currentAnim = this.anims.leftIdle;
+                    }
+                    this.currentAnim.flip.y = this.flip;
+                }
+                else
+                {
+                    this.gravityFactor = 1;
+                    this.accel.y = this.accelAir;
                 }
 
 
                 //move
                 this.parent();
             },
+
+
             handleMovementTrace: function (res)
             {
                 this.parent(res);
-                //collission with wall? returnS
+                //collission with wall?
+                //console.log(res.pos.x, res.pos.y);
 
                 if(res.collision.x && res.pos.x > 160)
                 {
                     //this.currentAnim = this.anims.rightIdle;
                     this.rightWall = true;
                     this.floor = false;
+                    this.ceiling = false;
+                    this.leftWall = false;
                     this.gravityFactor = 0;
 
 
                 }else if(res.collision.y && res.pos.y < 50)
                 {
-                    this.currentAnim = this.anims.upperIdle;
+
                     this.rightWall = false;
                     this.floor = false;
                     this.ceiling = true;
+                    this.leftWall = false;
                     this.gravityFactor = -1;
+                }else if(res.collision.x && res.pos.x < 30)
+                {
+                    this.rightWall = false;
+                    this.floor = false;
+                    this.ceiling = false;
+                    this.leftWall = true;
+                    this.gravityFactor = 0;
+                }
+                else if(res.collision.y && res.pos.y > 30)
+                {
+                    //console.log('collide with floor');
+                    this.floor = true;
+                    this.rightWall = false;
+                    this.ceiling = false;
+                    this.leftWall = false;
+                    this.gravityFactor = 1;
                 }
                 else
                 {
-                    this.floor = true;
+                    this.floor = false;
                     this.rightWall = false;
-                    this.celing = false;
-                    this.gravityFactor = 1;
+                    this.ceiling = false;
+                    this.leftWall = false;
                 }
             }
         });
