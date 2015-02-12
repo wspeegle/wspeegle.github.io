@@ -37,16 +37,16 @@ ig.module(
                 this.vel.x = this.speed * xdir;
                 this.currentAnim.flip.x = this.flip;
                 this.parent();
-            },
-            handleMovementTrace: function (res)
-            {
-                this.parent(res);
-                //collission with wall? returnS
-                if(res.collision.x)
+                },
+                handleMovementTrace: function (res)
                 {
-                    this.flip = !this.flip;
-                }
-            },
+                    this.parent(res);
+                    //collission with wall? returnS
+                    if(res.collision.x)
+                    {
+                        this.flip = !this.flip;
+                    }
+                },
             check: function(other)
             {
                 other.receiveDamage(10, this);
