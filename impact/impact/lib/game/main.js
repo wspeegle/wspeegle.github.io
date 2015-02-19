@@ -4,7 +4,7 @@ ig.module(
 .requires(
 	'impact.game',
 
-	'game.levels.hackathon4'
+	'game.levels.dorm1'
 )
 .defines(function(){
 
@@ -21,12 +21,21 @@ MyGame = ig.Game.extend({
 		ig.input.bind(ig.KEY.DOWN_ARROW, 'down');
 		ig.input.bind(ig.KEY.X, 'jump');
 		ig.input.bind(ig.KEY.C, 'shoot');
-		this.loadLevel(LevelHackathon4);
+		this.loadLevel(LevelDorm1);
 	},
 
 	update: function() {
 		// Update all entities and backgroundMaps
 		this.parent();
+		var player = this.getEntitiesByType(EntityPlayer)[0];
+		if(player)
+		{
+			this.screen.x = player.pos.x - ig.system.width/2;
+			this.screen.y = player.pos.y - ig.system.height/2;
+		}
+		this.parent(function () {
+
+		})
 
 		// Add your own, additional update code here
 	},

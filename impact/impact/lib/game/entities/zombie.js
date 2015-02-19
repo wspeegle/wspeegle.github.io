@@ -27,12 +27,14 @@ ig.module(
             },
             update: function(){
                 //near an edge? return
+                var rand = Math.random();
+                if(rand > .9){
                 if(!ig.game.collisionMap.getTile(
                         this.pos.x + (this.flip ? +4 : this.size.x -4),
                         this.pos.y + this.size.y+1
                     )){
                     this.flip = !this.flip;
-                }
+                }}
                 var xdir = this.flip ? -1:1;
                 this.vel.x = this.speed * xdir;
                 this.currentAnim.flip.x = this.flip;
