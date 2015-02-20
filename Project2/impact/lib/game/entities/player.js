@@ -232,7 +232,7 @@ ig.module(
                 }
                 this.currentAnim.alpha = this.idleTimer.delta().map(this.lifetime - this.fadetime, this.lifetime, 1,0);
                 this.parent();
-            }
+            },
 
 
         })
