@@ -10,7 +10,10 @@ ig.module(
 .defines(function()
     {
         EntityPlayer = ig.Entity.extend({
-        animSheet: new ig.AnimationSheet('media/playerhack.png',16,16),
+        animSheet: new ig.AnimationSheet('media/player.png',16,16),
+            weapon: 0,
+            totalWeapons: 2,
+            activeWeapon: "EntityBullet",
             size: {x: 8, y:14},
             offset: {x: 4, y:2},
             flips: false,
@@ -30,21 +33,23 @@ ig.module(
             init: function(x,y,settings)
             {
                 this.parent(x,y,settings);
-                this.addAnim('idle', 1, [18]);
-                this.addAnim('run',.07, [18,19,20,21,22,23]);
-                this.addAnim('jump', 1, [20]);
-                this.addAnim('fall',.4, [21,22]);
-                this.addAnim('leftIdle',1, [0]);
-                this.addAnim('leftRun',.07, [0,1,2,3,4,5]);
-                this.addAnim('upperIdle', 1, [6]);
-                this.addAnim('upperRun',.07, [6,7,8,9,10,11]);
-                this.addAnim('rightIdle', 1, [12]);
-                this.addAnim('rightRun',.07,[12,13,14,15,16,17]);
+                this.setupAnimation(this.weapon);
+
+
+            },
+            setupAnimation: function(offset)
+            {
+                offset = offset * 10;
+                this.addAnim('idle', 1, [0+offset]);
+                this.addAnim('run',.07, [0+offset, 1+offset, 2+offset, 3+offset, 4+offset, 5+offset]);
+                this.addAnim('jump', 1, [9+offset]);
+                this.addAnim('fall',.4, [6+offset, 7+offset]);
+
             },
             update: function()
             {
                 var accel = this.standing ? this.accelGround : this.accelAir;
-                if(this.floor) {
+
                     this.friction = {x: 600, y: 0};
                     if (ig.input.state('left')) {
                         this.accel.x = -accel;
@@ -60,6 +65,32 @@ ig.module(
                     if (this.standing && ig.input.pressed('jump')) {
                         this.vel.y = -this.jump;
                     }
+
+                    //shoot
+                    if(ig.input.pressed('shoot'))
+                    {
+                        ig.game.spawnEntity(this.activeWeapon, this.pos.x, this.pos.y, {flip: this.flip});
+                        console.log("in shoot", this.weapon);
+                    }
+                if(ig.input.released('switch'))
+                {
+                    console.log("weapon before ", this.weapon);
+                    this.weapon ++;
+                    console.log("weapon after", this.weapon);
+
+                    if(this.weapon >= this.totalWeapons)
+                        this.weapon = 0;
+                    switch(this.weapon)
+                    {
+                        case(0):
+                            this.activeWeapon = "EntityBullet";
+                            break;
+                        case(1):
+                            this.activeWeapon = "EntityGrenade";
+                            break;
+                    }
+                    this.setupAnimation(this.weapon);
+                }
                     //set current animation, based on player speed
                     if (this.vel.y < 0) {
                         this.currentAnim = this.anims.jump;
@@ -71,170 +102,72 @@ ig.module(
                         this.currentAnim = this.anims.idle;
                     }
                     this.currentAnim.flip.x = this.flip;
-                }
-                else if(this.rightWall)
-                {
-                    this.friction = {x: 0, y: 600};
-                    if(ig.input.state('down'))
-                    {
-                        this.accel.y = accel;
-                        this.flip = true;
-                    }else if(ig.input.state('up'))
-                    {
-                        this.accel.y = -accel;
-                        this.flip = false;
-                    }
-                    else{
-                        this.accel.y = 0;
-                    }
-                    if(ig.input.pressed('left'))
-                    {
-                      // this.friction = {x: 600, y: 0};
-
-                        this.gravityFactor = 0.01;
-                        this.vel.x = -10 *this.jump;
-
-                    }
-                    //jump
-
-                    //set current animation, based on player speed
-                    if(this.vel.x < 0)
-                    {
-                        this.currentAnim = this.anims.rightIdle;
-                    }else if(this.vel.x > 0)
-                    {
-                        this.currentAnim = this.anims.fall;
-                    }else if(this.vel.y != 0)
-                    {
-                        this.currentAnim = this.anims.rightRun;
-                    }else
-                    {
-                        this.currentAnim = this.anims.rightIdle;
-                    }
-                    this.currentAnim.flip.y = this.flip;
-                }else if(this.ceiling) {
-                    this.friction = {x: 600, y: 0};
-                    if (ig.input.state('left')) {
-                        this.accel.x = -accel;
-                        this.flip = false;
-                    } else if (ig.input.state('right')) {
-                        this.accel.x = accel;
-                        this.flip = true;
-                    }
-                    else {
-                        this.accel.x = 0;
-                    }
-                    //jump
-                    if (ig.input.pressed('down')) {
-                        this.vel.y = this.jump;
-                    }
-                    //set current animation, based on player speed
-                    if (this.vel.y < 0) {
-                        this.currentAnim = this.anims.upperIdle;
-                    } else if (this.vel.y > 0) {
-                        this.currentAnim = this.anims.fall;
-                    } else if (this.vel.x != 0) {
-                        this.currentAnim = this.anims.upperRun;
-                    } else {
-                        this.currentAnim = this.anims.upperIdle;
-                    }
-                    this.currentAnim.flip.x = this.flip;
-                }else if(this.leftWall)
-                {
-                    this.friction = {x: 0, y: 600};
-                    if(ig.input.state('up'))
-                    {
-                        this.accel.y = -accel;
-                        this.flip = true;
-                    }else if(ig.input.state('down'))
-                    {
-                        this.accel.y = accel;
-                        this.flip = false;
-                    }
-                    else{
-                        this.accel.y = 0;
-                    }
-                    //jump
-                    if( ig.input.pressed('right'))
-                    {
-                        this.vel.x = this.jump;
-                    }
-                    //set current animation, based on player speed
-                    if(this.vel.x < 0)
-                    {
-                        this.currentAnim = this.anims.leftIdle;
-                    }else if(this.vel.x > 0)
-                    {
-                        this.currentAnim = this.anims.fall;
-                    }else if(this.vel.y != 0)
-                    {
-                        this.currentAnim = this.anims.leftRun;
-                    }else
-                    {
-                        this.currentAnim = this.anims.leftIdle;
-                    }
-                    this.currentAnim.flip.y = this.flip;
-                }
-                else
-                {
-                    this.gravityFactor = 1;
-                    this.accel.y = this.accelAir;
-                }
 
 
-                //move
                 this.parent();
+            }
+
+
+        });
+        EntityBullet = ig.Entity.extend({
+            size: {x:5, y:3},
+            animSheet: new ig.AnimationSheet('media/bullet.png', 5,3),
+            maxVel: {x:200, y:0},
+            type: ig.Entity.TYPE.NONE,
+            checkAgainst: ig.Entity.TYPE.B,
+            collides: ig.Entity.COLLIDES.PASSIVE,
+            init: function(x,y,settings){
+                this.parent(x+(settings.flip ? -4 : 8), y+8, settings);
+                this.vel.x = this.accel.x = (settings.flip ? -this.maxVel.x : this.maxVel.x);
+                this.addAnim('idle',.2, [0]);
             },
-
-
-            handleMovementTrace: function (res)
+            handleMovementTrace: function(res)
             {
                 this.parent(res);
-                //collission with wall?
-                //console.log(res.pos.x, res.pos.y);
-
-                if(res.collision.x && res.pos.x > 160)
+                if(res.collision.x || res.collision.y)
                 {
-                    //this.currentAnim = this.anims.rightIdle;
-                    this.rightWall = true;
-                    this.floor = false;
-                    this.ceiling = false;
-                    this.leftWall = false;
-                    this.gravityFactor = 0;
-
-
-                }else if(res.collision.y && res.pos.y < 50)
-                {
-
-                    this.rightWall = false;
-                    this.floor = false;
-                    this.ceiling = true;
-                    this.leftWall = false;
-                    this.gravityFactor = -1;
-                }else if(res.collision.x && res.pos.x < 30)
-                {
-                    this.rightWall = false;
-                    this.floor = false;
-                    this.ceiling = false;
-                    this.leftWall = true;
-                    this.gravityFactor = 0;
+                    this.kill();
                 }
-                else if(res.collision.y && res.pos.y > 30)
-                {
-                    //console.log('collide with floor');
-                    this.floor = true;
-                    this.rightWall = false;
-                    this.ceiling = false;
-                    this.leftWall = false;
-                    this.gravityFactor = 1;
-                }
-                else
-                {
-                    this.floor = false;
-                    this.rightWall = false;
-                    this.ceiling = false;
-                    this.leftWall = false;
-                }
+            },
+            check: function(other)
+            {
+                other.receiveDamage(3,this);
+                this.kill();
             }
         });
+        EntityGrenade =ig.Entity.extend({
+            size:{x: 4, y:4},
+            offset: {x:2 , y:2},
+            animSheet: new ig.AnimationSheet('media/grenade.png', 8, 8),
+            type: ig.Entity.TYPE.NONE,
+            checkAgainst: ig.Entity.TYPE.BOTH,
+            collides: ig.Entity.COLLIDES.PASSIVE,
+            maxVel: {x:200, y: 200},
+            bounciness:.6,
+            bounceCounter: 0,
+            init: function(x,y,settings){
+                this.parent( x + (settings.flip ? -4 : 7), y, settings);
+                this.vel.x = (settings.flip ? -this.maxVel.x : this.maxVel.x);
+                this.vel.y = -(50 + (Math.random()*100));
+                this.addAnim('idle',.2, [0,1]);
+            },
+            handleMovementTrace: function(res)
+            {
+                this.parent(res);
+                if(res.collision.x || res.collision.y)
+                {
+                    this.bounceCounter++;
+                    if(this.bounceCounter > 3)
+                    {
+                        this.kill();
+                    }
+                }
+            },
+            check: function(other)
+            {
+                other.receiveDamage(10,this);
+                this.kill();
+            }
+
+        })
     });

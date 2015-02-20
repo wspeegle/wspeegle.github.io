@@ -21,6 +21,7 @@ MyGame = ig.Game.extend({
 		ig.input.bind(ig.KEY.DOWN_ARROW, 'down');
 		ig.input.bind(ig.KEY.X, 'jump');
 		ig.input.bind(ig.KEY.C, 'shoot');
+        ig.input.bind(ig.KEY.Z, 'switch');
 		this.loadLevel(LevelDorm1);
 	},
 
@@ -53,6 +54,6 @@ MyGame = ig.Game.extend({
 
 // Start the Game with 60fps, a resolution of 320x240, scaled
 // up by a factor of 2
-ig.main( '#canvas', MyGame, 60, 320, 240, 2 );
+ig.main( '#canvas', MyGame, 30, 320, 240, 2 );
 
 });
