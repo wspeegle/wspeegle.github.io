@@ -331,6 +331,8 @@ LevelDorm1=/*JSON[*/{
 		},
 		{
 			"name": "main",
+            "health": 10,
+            "type": ig.Entity.TYPE.A,
 			"width": 240,
 			"height": 160,
 			"linkWithCollision": false,

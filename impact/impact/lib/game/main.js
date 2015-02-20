@@ -15,14 +15,13 @@ MyGame = ig.Game.extend({
 
 	init: function() {
 		// Initialize your game here; bind keys etc.
+        this.loadLevel(LevelDorm1);
 		ig.input.bind(ig.KEY.LEFT_ARROW, 'left');
 		ig.input.bind(ig.KEY.RIGHT_ARROW, 'right');
-		ig.input.bind(ig.KEY.UP_ARROW, 'up');
-		ig.input.bind(ig.KEY.DOWN_ARROW, 'down');
 		ig.input.bind(ig.KEY.X, 'jump');
 		ig.input.bind(ig.KEY.C, 'shoot');
-        ig.input.bind(ig.KEY.Z, 'switch');
-		this.loadLevel(LevelDorm1);
+        ig.input.bind(ig.KEY.TAB, 'switch');
+
 	},
 
 	update: function() {
@@ -34,9 +33,7 @@ MyGame = ig.Game.extend({
 			this.screen.x = player.pos.x - ig.system.width/2;
 			this.screen.y = player.pos.y - ig.system.height/2;
 		}
-		this.parent(function () {
 
-		})
 
 		// Add your own, additional update code here
 	},
@@ -54,6 +51,6 @@ MyGame = ig.Game.extend({
 
 // Start the Game with 60fps, a resolution of 320x240, scaled
 // up by a factor of 2
-ig.main( '#canvas', MyGame, 30, 320, 240, 2 );
+ig.main( '#canvas', MyGame, 60, 320, 240, 2 );
 
 });
