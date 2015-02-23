@@ -2,7 +2,8 @@ ig.module(
     'game.entities.player'
 )
     .requires(
-    'impact.entity'
+    'impact.entity',
+    'impact.sound'
 )
     .defines(function(){
         EntityPlayer = ig.Entity.extend({
@@ -21,9 +22,16 @@ ig.module(
             weapon: 0,
             totalWeapons: 2,
             activeWeapon: "EntityBullet",
+            startPosition: null,
+            invincible: true,
+            invincibleDelay: 2,
+            invincibleTimer: null,
+            jumpSFX: new ig.Sound('media/sounds/jump.*'),
+            shootSFX: new ig.Sound('media/sounds/shoot.*'),
+            deathSFX: new ig.Sound('media/sounds/death.*'),
             init: function( x, y, settings ) {
                 this.parent( x, y, settings );
-
+                this.startPosition = {x:x , y:y};
                 this.addAnim('idle',1, [2,3]);
                 this.addAnim('run', .07, [5,6,7]);
                 this.addAnim('jump', 1, [0]);
@@ -31,6 +39,8 @@ ig.module(
                 this.addAnim('shot',.2, [1]);
                 this.addAnim('jumpShot',.2, [8]);
                 this.addAnim('runGun',.07, [9,10,11]);
+                this.invincibleTimer = new ig.Timer();
+                this.makeInvincible();
             },
             update: function() {
                 // move left or right
@@ -47,18 +57,23 @@ ig.module(
                 // jump
                 if( this.standing && ig.input.pressed('jump') ) {
                     this.vel.y = -this.jump;
+                    this.jumpSFX.play();
                 }
                 // shoot
                 if( ig.input.pressed('shoot') ) {
                     if(this.activeWeapon == "EntityBullet") {
                         if (this.vel.y == 0 && this.flip == true) {
                             ig.game.spawnEntity(this.activeWeapon, this.pos.x, this.pos.y + 5, {flip: this.flip});
+                            this.shootSFX.play();
                         } else if (this.vel.y == 0 && this.flip == false) {
                             ig.game.spawnEntity(this.activeWeapon, this.pos.x + 15, this.pos.y + 5, {flip: this.flip});
+                            this.shootSFX.play();
                         } else if (this.vel.y != 0 && this.flip == true) {
                             ig.game.spawnEntity(this.activeWeapon, this.pos.x, this.pos.y - 2, {flip: this.flip});
+                            this.shootSFX.play();
                         } else if (this.vel.y != 0 && this.flip == false) {
                             ig.game.spawnEntity(this.activeWeapon, this.pos.x + 15, this.pos.y - 2, {flip: this.flip});
+                            this.shootSFX.play();
                         }
                     }
                     if(this.activeWeapon == "EntityGrenade")
@@ -126,17 +141,41 @@ ig.module(
                     }
                 }
                 this.currentAnim.flip.x = this.flip;
-                // move!
-                this.parent();
-            },
-            kill:function()
-            {
-                for(var i = 0; i< 20; i++)
+                if(this.invincibleTimer.delta() > this.invincibleDelay)
                 {
-                    ig.game.spawnEntity(EntityDeathExplosion, this.pos.x, this.pos.y);
-
+                    this.invincible = false;
+                    this.currentAnim.alpha = 1;
                 }
                 this.parent();
+            },
+            makeInvincible: function()
+            {
+                this.invincible = true;
+                this.invincibleTimer.reset();
+            },
+            receiveDamage: function(amount, from)
+            {
+                if(this.invincible)
+                {
+                    return;
+                }
+                this.parent(amount, from);
+            },
+            draw: function()
+            {
+                if(this.invincible)
+                {
+                    this.currentAnim.alpha = this.invincibleTimer.delta() / this.invincibleDelay*1;
+                }
+                this.parent();
+            },
+            kill: function()
+            {
+                this.parent();
+                this.deathSFX.play();
+                var x = this.startPosition.x;
+                var y = this.startPosition.y;
+                ig.game.spawnEntity(EntityDeathExplosion, this.pos.x, this.pos.y, {callBack: function(){ig.game.spawnEntity(EntityPlayer,x,y)}});
             }
         });
         EntityBullet = ig.Entity.extend({
@@ -245,7 +284,7 @@ ig.module(
                 }
                 this.parent();
             }
-        })
+        });
 
         EntityGrenadeParticle = ig.Entity.extend({
             size:{x:1, y:1},
@@ -276,16 +315,16 @@ ig.module(
                 }
                 this.currentAnim.alpha = this.idleTimer.delta().map(this.lifetime - this.fadetime, this.lifetime, 1,0);
                 this.parent();
-            },
+            }
 
 
-        })
+        });
 
         EntityDeathExplosion = ig.Entity.extend({
             lifetime:1,
             callBack: null,
-            particles: 10,
-            init:function(x,y,settings)
+            particles: 25,
+            init: function(x,y,settings)
             {
                 this.parent(x,y,settings);
                 for(var i = 0; i<this.particles; i++)
@@ -294,7 +333,7 @@ ig.module(
                     this.idleTimer = new ig.Timer();
                 }
             },
-            update:function()
+            update: function()
             {
                 if(this.idleTimer.delta() > this.lifetime)
                 {
@@ -317,11 +356,11 @@ ig.module(
             collides: ig.Entity.COLLIDES.LITE,
             colorOffset: 0,
             totalColors: 7,
-            animSheet: new ig.AnimationSheet('media/blood.png', 2,2),
+            animSheet: new ig.AnimationSheet('media/blood2.png', 2,2),
             init: function(x,y,settings)
             {
                 this.parent(x,y,settings);
-                var frameID = Math.round(Math.random() * this.totalColors) + (this.colorOFfset * (this.totalColors + 1));
+                var frameID = Math.round(Math.random() * this.totalColors) + (this.colorOffset * (this.totalColors + 1));
                 this.addAnim('idle',.2, [frameID]);
                 this.vel.x = (Math.random()*2 -1) * this.vel.x;
                 this.vel.y = (Math.random()*2 -1) * this.vel.y;
@@ -329,11 +368,14 @@ ig.module(
             },
             update: function()
             {
-                if(this.idleTiomer.delta() > this.lifetime)
+
+                if(this.idleTimer.delta() > this.lifetime)
                 {
                     this.kill();
                     return;
                 }
+               // this.currentAnim = this.anims.idle;
+                //this.currentAnim.alpha = 1;
                 this.currentAnim.alpha = this.idleTimer.delta().map(this.lifetime - this.fadetime, this.lifetime, 1,0);
                 this.parent();
             }

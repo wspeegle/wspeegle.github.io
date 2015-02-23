@@ -1,5 +1,5 @@
 ig.module( 'game.levels.dorm1' )
-.requires( 'impact.image','game.entities.player','game.entities.zombie' )
+.requires( 'impact.image','game.entities.player','game.entities.zombie','game.entities.levelexit' )
 .defines(function(){
 LevelDorm1=/*JSON[*/{
 	"entities": [
@@ -12,6 +12,14 @@ LevelDorm1=/*JSON[*/{
 			"type": "EntityZombie",
 			"x": 132,
 			"y": 430
+		},
+		{
+			"type": "EntityLevelexit",
+			"x": 504,
+			"y": 424,
+			"settings": {
+				"level": "dorm2"
+			}
 		}
 	],
 	"layer": [
@@ -20,7 +28,7 @@ LevelDorm1=/*JSON[*/{
 			"width": 300,
 			"height": 250,
 			"linkWithCollision": false,
-			"visible": true,
+			"visible": 1,
 			"tilesetName": "media/dorm-tiles.png",
 			"repeat": false,
 			"preRender": false,

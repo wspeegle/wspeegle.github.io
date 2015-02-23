@@ -1,6 +1,3 @@
-/**
- * Created by William on 2/12/2015.
- */
 ig.module(
     'game.entities.zombie'
 )
@@ -69,7 +66,7 @@ ig.module(
             {
                 this.parent();
 
-                //ig.game.spawnEntity(EntityDeathExplosion, this.pos.x, this.pos.y);
+                ig.game.spawnEntity(EntityDeathExplosion, this.pos.x, this.pos.y, {colorOffset: 1});
             }
 
 
