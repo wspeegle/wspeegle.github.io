@@ -6,33 +6,31 @@ ig.module(
 )
     .defines(function(){
         EntityPlayer = ig.Entity.extend({
-            animSheet: new ig.AnimationSheet( 'media/player.png', 16, 16 ),
-            size: {x: 8, y:14},
+            animSheet: new ig.AnimationSheet( 'media/mmplayer.png', 30, 30 ),
+            size: {x:20, y:27},
             offset: {x: 4, y: 2},
             flip: false,
-            maxVel: {x: 100, y: 150},
+            maxVel: {x: 100, y: 200},
             friction: {x: 600, y: 0},
             accelGround: 400,
             accelAir: 200,
-            jump: 200,
+            jump: 300,
             type: ig.Entity.TYPE.A,
             checkAgainst: ig.Entity.TYPE.NONE,
             collides: ig.Entity.COLLIDES.PASSIVE,
             weapon: 0,
-            totalWeapons: 3,
+            totalWeapons: 2,
             activeWeapon: "EntityBullet",
             init: function( x, y, settings ) {
                 this.parent( x, y, settings );
-                this.setupAnimation(this.weapon);
-            },
-            setupAnimation: function(offset){
-                if(offset == 2)
-                    offset =1;
-                offset = offset * 10;
-                this.addAnim('idle', 1, [0+offset]);
-                this.addAnim('run', .07, [0+offset,1+offset,2+offset,3+offset,4+offset,5+offset]);
-                this.addAnim('jump', 1, [9+offset]);
-                this.addAnim('fall', 0.4, [6+offset,7+offset]);
+
+                this.addAnim('idle',1, [2,3]);
+                this.addAnim('run', .07, [5,6,7]);
+                this.addAnim('jump', 1, [0]);
+                this.addAnim('fall', 0.4, [0]);
+                this.addAnim('shot',.2, [1]);
+                this.addAnim('jumpShot',.2, [8]);
+                this.addAnim('runGun',.07, [9,10,11]);
             },
             update: function() {
                 // move left or right
@@ -52,7 +50,30 @@ ig.module(
                 }
                 // shoot
                 if( ig.input.pressed('shoot') ) {
-                    ig.game.spawnEntity( this.activeWeapon, this.pos.x, this.pos.y, {flip:this.flip} );
+                    if(this.activeWeapon == "EntityBullet") {
+                        if (this.vel.y == 0 && this.flip == true) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x, this.pos.y + 5, {flip: this.flip});
+                        } else if (this.vel.y == 0 && this.flip == false) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x + 15, this.pos.y + 5, {flip: this.flip});
+                        } else if (this.vel.y != 0 && this.flip == true) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x, this.pos.y - 2, {flip: this.flip});
+                        } else if (this.vel.y != 0 && this.flip == false) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x + 15, this.pos.y - 2, {flip: this.flip});
+                        }
+                    }
+                    if(this.activeWeapon == "EntityGrenade")
+                    {
+                        if (this.vel.y == 0 && this.flip == true) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x, this.pos.y+13, {flip: this.flip});
+                        } else if (this.vel.y == 0 && this.flip == false) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x + 15, this.pos.y+13, {flip: this.flip});
+                        } else if (this.vel.y != 0 && this.flip == true) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x, this.pos.y+7, {flip: this.flip});
+                        } else if (this.vel.y != 0 && this.flip == false) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x + 15, this.pos.y+7, {flip: this.flip});
+                        }
+                    }
+
                 }
                 if( ig.input.pressed('switch') ) {
                     this.weapon ++;
@@ -65,21 +86,44 @@ ig.module(
                         case(1):
                             this.activeWeapon = "EntityGrenade";
                             break;
-                        case(2):
-                            this.activeWeapon = "EntityWMD";
-                            break;
+
                     }
-                    this.setupAnimation(this.weapon);
+
                 }
                 // set the current animation, based on the player's speed
-                if( this.vel.y < 0 ) {
-                    this.currentAnim = this.anims.jump;
-                }else if( this.vel.y > 0 ) {
-                    this.currentAnim = this.anims.fall;
-                }else if( this.vel.x != 0 ) {
-                    this.currentAnim = this.anims.run;
-                }else{
-                    this.currentAnim = this.anims.idle;
+               if(ig.input.pressed('shoot'))
+               {
+                   if(this.vel.y != 0)
+                   {
+                       this.currentAnim = this.anims.jumpShot.rewind();
+                   }else if(this.vel.x !=0)
+                   {
+                       this.currentAnim = this.anims.runGun.rewind();
+                   }else
+                   {
+                       this.currentAnim = this.anims.shot.rewind();
+                   }
+               }
+                if(this.currentAnim == this.anims.shot || this.currentAnim == this.anims.jumpShot || this.currentAnim == this.anims.runGun)
+                {
+                    if(this.currentAnim.loopCount)
+                    {
+                        this.currentAnim = this.anims.idle;
+                    }
+                }else
+                {
+                    if(this.vel.y < 0)
+                    {
+                        this.currentAnim = this.anims.jump;
+                    }else if(this.vel.y > 0 )
+                    {
+                        this.currentAnim = this.anims.fall;
+                    }else if(this.vel.x != 0)
+                    {
+                        this.currentAnim = this.anims.run;
+                    }else {
+                        this.currentAnim = this.anims.idle;
+                    }
                 }
                 this.currentAnim.flip.x = this.flip;
                 // move!
@@ -89,7 +133,7 @@ ig.module(
             {
                 for(var i = 0; i< 20; i++)
                 {
-                    ig.game.spawnEntity(EntityGrenadeParticle, this.pos.x, this.pos.y);
+                    ig.game.spawnEntity(EntityDeathExplosion, this.pos.x, this.pos.y);
 
                 }
                 this.parent();
@@ -114,7 +158,7 @@ ig.module(
                 }
             },
             check: function( other ) {
-                other.receiveDamage( 3, this );
+                other.receiveDamage( 10, this );
                 this.kill();
             }
         });
@@ -132,7 +176,7 @@ ig.module(
                 this.parent( x + (settings.flip ? -4 : 7), y, settings );
                 this.vel.x = (settings.flip ? -this.maxVel.x : this.maxVel.x);
                 this.vel.y = -(50 + (Math.random()*100));
-                this.addAnim( 'idle', 0.2, [0,1] );
+                this.addAnim( 'idle', 0.2, [1,0] );
             },
             handleMovementTrace: function( res ) {
                 this.parent( res );
@@ -236,5 +280,63 @@ ig.module(
 
 
         })
+
+        EntityDeathExplosion = ig.Entity.extend({
+            lifetime:1,
+            callBack: null,
+            particles: 10,
+            init:function(x,y,settings)
+            {
+                this.parent(x,y,settings);
+                for(var i = 0; i<this.particles; i++)
+                {
+                    ig.game.spawnEntity(EntityDeathExplosionParticle, x, y, {colorOffset: settings.colorOffset ? settings.colorOffset : 0});
+                    this.idleTimer = new ig.Timer();
+                }
+            },
+            update:function()
+            {
+                if(this.idleTimer.delta() > this.lifetime)
+                {
+                    this.kill();
+                    if(this.callBack)
+                        this.callBack();
+                    return;
+                }
+            }
+        });
+
+        EntityDeathExplosionParticle = ig.Entity.extend({
+            size: {x:2, y: 2},
+            maxVel: {x: 160, y:200},
+            lifetime: 2,
+            fadetime: 1,
+            bounciness: 0,
+            vel: {x:100, y: 30},
+            friction: {x:100, y: 0},
+            collides: ig.Entity.COLLIDES.LITE,
+            colorOffset: 0,
+            totalColors: 7,
+            animSheet: new ig.AnimationSheet('media/blood.png', 2,2),
+            init: function(x,y,settings)
+            {
+                this.parent(x,y,settings);
+                var frameID = Math.round(Math.random() * this.totalColors) + (this.colorOFfset * (this.totalColors + 1));
+                this.addAnim('idle',.2, [frameID]);
+                this.vel.x = (Math.random()*2 -1) * this.vel.x;
+                this.vel.y = (Math.random()*2 -1) * this.vel.y;
+                this.idleTimer = new ig.Timer();
+            },
+            update: function()
+            {
+                if(this.idleTiomer.delta() > this.lifetime)
+                {
+                    this.kill();
+                    return;
+                }
+                this.currentAnim.alpha = this.idleTimer.delta().map(this.lifetime - this.fadetime, this.lifetime, 1,0);
+                this.parent();
+            }
+        });
 
     });
