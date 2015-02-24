@@ -29,6 +29,7 @@ ig.module(
             jumpSFX: new ig.Sound('media/sounds/jump.*'),
             shootSFX: new ig.Sound('media/sounds/shoot.*'),
             deathSFX: new ig.Sound('media/sounds/death.*'),
+            lives: 3,
             init: function( x, y, settings ) {
                 this.parent( x, y, settings );
                 this.startPosition = {x:x , y:y};
@@ -172,11 +173,23 @@ ig.module(
             kill: function()
             {
                 this.parent();
+                ig.game.stats.deaths++;
                 this.deathSFX.play();
-                var x = this.startPosition.x;
-                var y = this.startPosition.y;
-                ig.game.spawnEntity(EntityDeathExplosion, this.pos.x, this.pos.y, {callBack: function(){ig.game.spawnEntity(EntityPlayer,x,y)}});
+                ig.game.respawnPosition = this.startPosition;
+                ig.game.spawnEntity(EntityDeathExplosion, this.pos.x, this.pos.y, {callBack: this.onDeath});
+            },
+            onDeath: function()
+            {
+                ig.game.stats.deaths++;
+                ig.game.lives--;
+                if(ig.game.lives < 0 )
+                {
+                    ig.game.gameOver();
+                }else{
+                    ig.game.spawnEntity(EntityPlayer, ig.game.respawnPosition.x, ig.game.respawnPosition.y);
+                }
             }
+
         });
         EntityBullet = ig.Entity.extend({
             size: {x: 5, y: 3},

@@ -65,7 +65,7 @@ ig.module(
             kill: function()
             {
                 this.parent();
-
+                ig.game.stats.kills++;
                 ig.game.spawnEntity(EntityDeathExplosion, this.pos.x, this.pos.y, {colorOffset: 1});
             }
 
