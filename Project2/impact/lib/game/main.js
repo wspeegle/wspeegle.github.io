@@ -5,7 +5,8 @@ ig.module(
 	'impact.game',
 	'impact.timer',
 	'game.levels.dorm1',
-	'game.levels.dorm2'
+	'game.levels.dorm2',
+    'game.levels.test1'
 )
 .defines(function(){
 
@@ -17,20 +18,26 @@ MyGame = ig.Game.extend({
 	levelExit: null,
 	stats: {time: 0, kills: 0, deaths: 0},
 	lifeSprite: new ig.Image('media/blood.png'),
+    lives: 3,
 
 	gravity: 300,
+    lifeSprite: new ig.Image('media/life-sprite.png'),
+
 
 	init: function() {
 		// Initialize your game here; bind keys etc.
-        this.loadLevel(LevelDorm1);
-		ig.music.add('media/sounds/theme.*');
-		ig.music.volume = .7;
+
+
+        this.loadLevel(LevelTest1);
+		ig.music.add('media/sounds/theme1.*');
+		ig.music.volume = .1;
+
 		ig.music.play();
 		ig.input.bind(ig.KEY.LEFT_ARROW, 'left');
 		ig.input.bind(ig.KEY.RIGHT_ARROW, 'right');
 		ig.input.bind(ig.KEY.X, 'jump');
 		ig.input.bind(ig.KEY.C, 'shoot');
-        ig.input.bind(ig.KEY.TAB, 'switch');
+        ig.input.bind(ig.KEY.Z, 'switch');
 		ig.input.bind(ig.KEY.SPACE, 'continue');
 
 	},

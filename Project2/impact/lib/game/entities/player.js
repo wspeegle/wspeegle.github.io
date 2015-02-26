@@ -3,7 +3,8 @@ ig.module(
 )
     .requires(
     'impact.entity',
-    'impact.sound'
+    'impact.sound',
+    'game.entities.debris'
 )
     .defines(function(){
         EntityPlayer = ig.Entity.extend({
@@ -11,11 +12,11 @@ ig.module(
             size: {x:20, y:27},
             offset: {x: 4, y: 2},
             flip: false,
-            maxVel: {x: 100, y: 200},
-            friction: {x: 600, y: 0},
+            maxVel: {x: 150, y: 250},
+            friction: {x: 400, y: 0},
             accelGround: 400,
             accelAir: 200,
-            jump: 300,
+            jump: 250,
             type: ig.Entity.TYPE.A,
             checkAgainst: ig.Entity.TYPE.NONE,
             collides: ig.Entity.COLLIDES.PASSIVE,
@@ -173,7 +174,7 @@ ig.module(
             kill: function()
             {
                 this.parent();
-                ig.game.stats.deaths++;
+
                 this.deathSFX.play();
                 ig.game.respawnPosition = this.startPosition;
                 ig.game.spawnEntity(EntityDeathExplosion, this.pos.x, this.pos.y, {callBack: this.onDeath});
@@ -194,7 +195,7 @@ ig.module(
         EntityBullet = ig.Entity.extend({
             size: {x: 5, y: 3},
             animSheet: new ig.AnimationSheet( 'media/bullet.png', 5, 3 ),
-            maxVel: {x: 200, y: 0},
+            maxVel: {x: 300, y: 0},
             type: ig.Entity.TYPE.NONE,
             checkAgainst: ig.Entity.TYPE.B,
             collides: ig.Entity.COLLIDES.PASSIVE,
@@ -203,8 +204,37 @@ ig.module(
                 this.vel.x = this.accel.x = (settings.flip ? -this.maxVel.x : this.maxVel.x);
                 this.addAnim( 'idle', 0.2, [0] );
             },
+            //update: function()
+            //{
+            //    if(!this.flip) {
+            //        if (ig.game.getMapByName('Destructable').getTile(this.pos.x + this.size.x * 2, this.pos.y)) {
+            //            console.log(this.flip);
+            //            ig.game.getMapByName('Destructable').setTile(this.pos.x + this.size.x * 2, this.pos.y , 0);
+            //            ig.game.collisionMap.setTile(this.pos.x + this.size.x * 2, this.pos.y, 0);
+            //            for (var i = 0; i < 5; i++) {
+            //                var x = Math.random().map(0, 1, this.pos.x, this.pos.x + this.size.x);
+            //                var y = Math.random().map(0, 1, this.pos.y, this.pos.y + this.size.y);
+            //                ig.game.spawnEntity(EntityDebrisParticle, x, y);
+            //            }
+            //        }
+            //    }else
+            //    {
+            //        if (ig.game.getMapByName('Destructable').getTile(this.pos.x -this.size.x * 2, this.pos.y)) {
+            //            console.log(this.flip);
+            //            ig.game.getMapByName('Destructable').setTile(this.pos.x - this.size.x * 2, this.pos.y, 0);
+            //            ig.game.collisionMap.setTile(this.pos.x - this.size.x * 2, this.pos.y, 0);
+            //            for (var i = 0; i < 5; i++) {
+            //                var x = Math.random().map(0, 1, this.pos.x, this.pos.x + this.size.x);
+            //                var y = Math.random().map(0, 1, this.pos.y, this.pos.y + this.size.y);
+            //                ig.game.spawnEntity(EntityDebrisParticle, x, y);
+            //            }
+            //        }
+            //    }
+            //    this.parent();
+            //},
             handleMovementTrace: function( res ) {
                 this.parent( res );
+
                 if( res.collision.x || res.collision.y ){
                     this.kill();
                 }
@@ -223,12 +253,28 @@ ig.module(
             collides: ig.Entity.COLLIDES.PASSIVE,
             maxVel: {x: 200, y: 200},
             bounciness: 0.6,
-            bounceCounter: 0,
+            bounceCounter: 3,
             init: function( x, y, settings ) {
                 this.parent( x + (settings.flip ? -4 : 7), y, settings );
                 this.vel.x = (settings.flip ? -this.maxVel.x : this.maxVel.x);
                 this.vel.y = -(50 + (Math.random()*100));
                 this.addAnim( 'idle', 0.2, [1,0] );
+            },
+            update: function()
+            {
+                this.parent();
+                if(ig.game.getMapByName('Destructable').getTile(this.pos.x + this.size.x /2, this.pos.y + this.size.y/2))
+                {
+                    console.log("true");
+                    ig.game.getMapByName('Destructable').setTile(this.pos.x + this.size.x /2, this.pos.y + this.size.y /2, 0);
+                    ig.game.collisionMap.setTile(this.pos.x + this.size.x /2, this.pos.y + this.size.y /2, 0);
+                    for(var i=0; i<5; i++)
+                    {
+                        var x = Math.random().map(0,1,this.pos.x, this.pos.x+this.size.x);
+                        var y = Math.random().map(0,1,this.pos.y, this.pos.y+this.size.y);
+                        ig.game.spawnEntity(EntityDebrisParticle,x,y);
+                    }
+                }
             },
             handleMovementTrace: function( res ) {
                 this.parent( res );
@@ -238,11 +284,40 @@ ig.module(
                     if( this.bounceCounter > 3 ) {
                         this.kill();
                     }
+
                 }
             },
             check: function( other ) {
                 other.receiveDamage( 10, this );
                 this.kill();
+            },
+            update: function()
+            {
+                if(!this.flip) {
+                    if (ig.game.getMapByName('Destructable').getTile(this.pos.x + this.size.x * 2, this.pos.y)) {
+                        console.log(this.flip);
+                        ig.game.getMapByName('Destructable').setTile(this.pos.x + this.size.x * 2, this.pos.y , 0);
+                        ig.game.collisionMap.setTile(this.pos.x + this.size.x * 2, this.pos.y, 0);
+                        for (var i = 0; i < 5; i++) {
+                            var x = Math.random().map(0, 1, this.pos.x, this.pos.x + this.size.x);
+                            var y = Math.random().map(0, 1, this.pos.y, this.pos.y + this.size.y);
+                            ig.game.spawnEntity(EntityDebrisParticle, x, y);
+                        }
+                    }
+                }else
+                {
+                    if (ig.game.getMapByName('Destructable').getTile(this.pos.x -this.size.x * 2, this.pos.y)) {
+                        console.log(this.flip);
+                        ig.game.getMapByName('Destructable').setTile(this.pos.x - this.size.x * 2, this.pos.y, 0);
+                        ig.game.collisionMap.setTile(this.pos.x - this.size.x * 2, this.pos.y, 0);
+                        for (var i = 0; i < 5; i++) {
+                            var x = Math.random().map(0, 1, this.pos.x, this.pos.x + this.size.x);
+                            var y = Math.random().map(0, 1, this.pos.y, this.pos.y + this.size.y);
+                            ig.game.spawnEntity(EntityDebrisParticle, x, y);
+                        }
+                    }
+                }
+                this.parent();
             },
             kill:function()
             {
@@ -327,6 +402,8 @@ ig.module(
                     return;
                 }
                 this.currentAnim.alpha = this.idleTimer.delta().map(this.lifetime - this.fadetime, this.lifetime, 1,0);
+
+
                 this.parent();
             }
 
