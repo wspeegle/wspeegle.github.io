@@ -61,7 +61,12 @@ ig.module(
                     this.vel.y = -this.jump;
                     this.jumpSFX.play();
                 }
-                // shoot
+                // check for ladders
+                if(ig.input.pressed('up') && ig.game.getMapByName('Ladder').getTile(this.pos.x + this.size.x /2, this.pos.y + this.size.y /2) )
+                {
+                    console.log("true");
+                    this.accel.y = -10;
+                }
                 if( ig.input.pressed('shoot') ) {
                     if(this.activeWeapon == "EntityBullet") {
                         if (this.vel.y == 0 && this.flip == true) {

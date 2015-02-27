@@ -35,6 +35,8 @@ MyGame = ig.Game.extend({
 		ig.music.play();
 		ig.input.bind(ig.KEY.LEFT_ARROW, 'left');
 		ig.input.bind(ig.KEY.RIGHT_ARROW, 'right');
+		ig.input.bind(ig.KEY.UP_ARROW, 'up');
+		ig.input.bind(ig.KEY.DOWN_ARROW, 'down');
 		ig.input.bind(ig.KEY.X, 'jump');
 		ig.input.bind(ig.KEY.C, 'shoot');
         ig.input.bind(ig.KEY.Z, 'switch');
