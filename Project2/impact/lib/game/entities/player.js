@@ -16,7 +16,7 @@ ig.module(
             friction: {x: 400, y: 0},
             accelGround: 400,
             accelAir: 200,
-            jump: 250,
+            jump: 200 ,
             type: ig.Entity.TYPE.A,
             checkAgainst: ig.Entity.TYPE.NONE,
             collides: ig.Entity.COLLIDES.PASSIVE,
@@ -31,6 +31,7 @@ ig.module(
             shootSFX: new ig.Sound('media/sounds/shoot.*'),
             deathSFX: new ig.Sound('media/sounds/death.*'),
             lives: 3,
+            isClimbing :false,
             init: function( x, y, settings ) {
                 this.parent( x, y, settings );
                 this.startPosition = {x:x , y:y};
@@ -41,6 +42,8 @@ ig.module(
                 this.addAnim('shot',.2, [1]);
                 this.addAnim('jumpShot',.2, [8]);
                 this.addAnim('runGun',.07, [9,10,11]);
+                this.addAnim('ladder',.07, [12,13]);
+                this.addAnim('ladderShoot',.2, [14]);
                 this.invincibleTimer = new ig.Timer();
                 this.makeInvincible();
             },
@@ -65,7 +68,9 @@ ig.module(
                 if(ig.input.pressed('up') && ig.game.getMapByName('Ladder').getTile(this.pos.x + this.size.x /2, this.pos.y + this.size.y /2) )
                 {
                     console.log("true");
-                    this.accel.y = -10;
+                    this.isClimbing = true;
+
+                    this.accel.y = -this.accelAir  ;
                 }
                 if( ig.input.pressed('shoot') ) {
                     if(this.activeWeapon == "EntityBullet") {
@@ -113,6 +118,10 @@ ig.module(
 
                 }
                 // set the current animation, based on the player's speed
+                if(this.isClimbing)
+                {
+                    this.currentAnim = this.anims.ladder.rewind();
+                }
                if(ig.input.pressed('shoot'))
                {
                    if(this.vel.y != 0)
@@ -134,7 +143,7 @@ ig.module(
                     }
                 }else
                 {
-                    if(this.vel.y < 0)
+                    if(this.vel.y < 0 && !this.isClimbing)
                     {
                         this.currentAnim = this.anims.jump;
                     }else if(this.vel.y > 0 )

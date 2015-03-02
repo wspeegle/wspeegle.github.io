@@ -32,7 +32,7 @@ MyGame = ig.Game.extend({
 		ig.music.add('media/sounds/theme1.*');
 		ig.music.volume = .1;
 
-		ig.music.play();
+		//ig.music.play();
 		ig.input.bind(ig.KEY.LEFT_ARROW, 'left');
 		ig.input.bind(ig.KEY.RIGHT_ARROW, 'right');
 		ig.input.bind(ig.KEY.UP_ARROW, 'up');
