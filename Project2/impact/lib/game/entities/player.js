@@ -41,8 +41,12 @@ ig.module(
                 this.addAnim('shot',.2, [1]);
                 this.addAnim('jumpShot',.2, [8]);
                 this.addAnim('runGun',.07, [9,10,11]);
+                this.addAnim('ladder',.1, [12,13]);
+                this.addAnim('ladderShoot',.2, [14]);
+                this.addAnim('ladderIdle', 1, [12]);
                 this.invincibleTimer = new ig.Timer();
                 this.makeInvincible();
+                ig.game.player = this;
             },
             update: function() {
                 // move left or right
@@ -61,12 +65,7 @@ ig.module(
                     this.vel.y = -this.jump;
                     this.jumpSFX.play();
                 }
-                // check for ladders
-                if(ig.input.pressed('up') && ig.game.getMapByName('Ladder').getTile(this.pos.x + this.size.x /2, this.pos.y + this.size.y /2) )
-                {
-                    console.log("true");
-                    this.accel.y = -10;
-                }
+
                 if( ig.input.pressed('shoot') ) {
                     if(this.activeWeapon == "EntityBullet") {
                         if (this.vel.y == 0 && this.flip == true) {
@@ -112,15 +111,18 @@ ig.module(
                     }
 
                 }
-                // set the current animation, based on the player's speed
+                // set the current animation
                if(ig.input.pressed('shoot'))
                {
-                   if(this.vel.y != 0)
+                   if(this.vel.y != 0 && !this.isClimbing)
                    {
                        this.currentAnim = this.anims.jumpShot.rewind();
                    }else if(this.vel.x !=0)
                    {
                        this.currentAnim = this.anims.runGun.rewind();
+                   }else if(this.isClimbing)
+                   {
+                       this.currentAnim = this.anims.ladderShoot.rewind();
                    }else
                    {
                        this.currentAnim = this.anims.shot.rewind();
@@ -132,20 +134,25 @@ ig.module(
                     {
                         this.currentAnim = this.anims.idle;
                     }
-                }else
+                }else //if(this.ladderTouchedTimer.delta() > 0)
                 {
-                    if(this.vel.y < 0)
+                    if(this.vel.y < 0 && this.ladderTouchedTimer.delta() >0)
                     {
                         this.currentAnim = this.anims.jump;
-                    }else if(this.vel.y > 0 )
+                    }else if(this.vel.y > 0 && this.ladderTouchedTimer.delta() >0)
                     {
                         this.currentAnim = this.anims.fall;
                     }else if(this.vel.x != 0)
                     {
                         this.currentAnim = this.anims.run;
-                    }else {
-                        this.currentAnim = this.anims.idle;
-                    }
+                    }else if(this.isClimbing) {
+
+                        this.currentAnim = this.anims.ladder;
+                    } else
+                    {
+                            this.currentAnim = this.anims.idle;
+                        }
+
                 }
                 this.currentAnim.flip.x = this.flip;
                 if(this.invincibleTimer.delta() > this.invincibleDelay)
@@ -153,6 +160,21 @@ ig.module(
                     this.invincible = false;
                     this.currentAnim.alpha = 1;
                 }
+                this.zIndex = 99;
+                // ------------------ begin ladder code ------------------
+                if (this.isConfiguredForClimbing){      // this will only be true if level contains a ladder
+                    this.checkForLadder(this);
+                    if (this.ladderTouchedTimer.delta() > 0) this.isTouchingLadder = false;
+                    // reset in case player leaves ladder. This allows to walk across/atop ladder
+                }else{
+                    var ladders = ig.game.getEntitiesByType("EntityLadder");
+                    if (ladders != undefined) {
+                        for (var i = 0 ; i < ladders.length; i ++){
+                            ladders[i].makeEntitiesEligibleClimbers();
+                        }
+                    }
+                }
+                // ------------------  end  ladder code ------------------
                 this.parent();
             },
             makeInvincible: function()
