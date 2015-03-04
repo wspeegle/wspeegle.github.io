@@ -21,7 +21,7 @@ ig.module(
             checkAgainst: ig.Entity.TYPE.NONE,
             collides: ig.Entity.COLLIDES.PASSIVE,
             weapon: 0,
-            totalWeapons: 3,
+            totalWeapons: 2,
             activeWeapon: "EntityBullet",
             startPosition: null,
             invincible: true,
@@ -32,6 +32,7 @@ ig.module(
             deathSFX: new ig.Sound('media/sounds/death.*'),
             lives: 3,
             isSwimming: false,
+            canFly: false,
             init: function( x, y, settings ) {
                 this.parent( x, y, settings );
                 this.startPosition = {x:x , y:y};
@@ -51,8 +52,8 @@ ig.module(
             },
             update: function() {
                 // move left or right
-
-                if(this.isSwimming)
+                console.log(this.canFly, "can fly");
+                 if(this.isSwimming)
                 {
                     console.log("swimming");
                     this.gravityFactor = .1;
@@ -76,6 +77,12 @@ ig.module(
                 if( this.standing && ig.input.pressed('jump') ) {
                     this.vel.y = -this.jump;
                     this.jumpSFX.play();
+                }
+
+                if(this.canFly && ig.input.state('up'))
+                {
+                    this.vel.y = -this.jump;
+                    ig.game.spawnEntity(EntityFlight, this.pos.x, this.pos.y, {flip: this.flip});
                 }
 
                 if( ig.input.pressed('shoot') ) {
@@ -411,36 +418,36 @@ ig.module(
             offset: {x: 2, y:2},
             animSheet: new ig.AnimationSheet('media/bomb.png', 15,15),
             type: ig.Entity.TYPE.NONE,
-            checkAgainst: ig.Entity.TYPE.BOTH,
+            checkAgainst: ig.Entity.TYPE.B,
             collides: ig.Entity.COLLIDES.PASSIVE,
-            maxVel: {x: 400, y: 200},
+            maxVel: {x: 50, y: 0},
             bounciness:.5,
             bounceCounter: 0,
             init: function( x, y, settings ) {
                 this.parent( x + (settings.flip ? -4 : 7), y, settings );
                 this.vel.x = this.accel.x = (settings.flip ? -this.maxVel.x : this.maxVel.x);
                 //this.vel.y = -(50 + (Math.random()*100));
-                this.addAnim( 'idle', 0.2, [0] );
+                this.addAnim( 'idle', 0.1, [0,1,2,3,4] );
             },
             handleMovementTrace: function( res ) {
                 this.parent( res );
                 if( res.collision.x || res.collision.y ) {
                     // only bounce 3 times
-                    //this.bounceCounter++;
-                   // if( this.bounceCounter > 3 ) {
+                    this.bounceCounter++;
+                    if( this.bounceCounter > 3 ) {
                         this.kill();
-                        //ig.game.backgroundMaps[0].setTile(this.pos.x, this.pos.y+10 , 0);
-                       // ig.game.collisionMap.setTile(this.pos.x, this.pos.y+10, 0);
-                    //}
+                        ig.game.backgroundMaps[0].setTile(this.pos.x, this.pos.y+10 , 0);
+                       ig.game.collisionMap.setTile(this.pos.x, this.pos.y+10, 0);
+                    }
                 }
             },
             check: function( other ) {
                 other.receiveDamage( 50, this );
-                this.kill();
+               // this.kill();
             },
             kill:function()
             {
-                for(var i = 0; i< 300; i++)
+                for(var i = 0; i< 50; i++)
                 {
                     ig.game.spawnEntity(EntityGrenadeParticle, this.pos.x, this.pos.y);
 
@@ -509,6 +516,42 @@ ig.module(
                 }
             }
         });
+
+        EntityFlight = ig.Entity.extend({
+            lifetime: 1,
+            callBack: null,
+            particles: 5,
+            init: function(x,y,settings)
+            {
+                this.parent(x,y,settings);
+
+                if(!settings.flip) {
+                    for (var i = 0; i < this.particles; i++) {
+                        ig.game.spawnEntity(EntityDeathExplosionParticle, x + 7, y + 25, {colorOffset: settings.colorOffset ? settings.colorOffset : 0});
+                        ig.game.spawnEntity(EntityDeathExplosionParticle, x + 17, y + 17, {colorOffset: settings.colorOffset ? settings.colorOffset : 0});
+                        this.idleTimer = new ig.Timer();
+                    }
+                }else
+                    for (var i = 0; i < this.particles; i++) {
+                        ig.game.spawnEntity(EntityDeathExplosionParticle, x + 4, y + 17, {colorOffset: settings.colorOffset ? settings.colorOffset : 0});
+                        ig.game.spawnEntity(EntityDeathExplosionParticle, x + 13, y + 25, {colorOffset: settings.colorOffset ? settings.colorOffset : 0});
+                        this.idleTimer = new ig.Timer();
+                    }
+
+            },
+            update: function()
+            {
+                if(this.idleTimer.delta() > this.lifetime)
+                {
+                    this.kill();
+                    if(this.callBack)
+                    {
+                        this.callBack();
+                    }
+                    return;
+                }
+            }
+        })
 
         EntityDeathExplosionParticle = ig.Entity.extend({
             size: {x:2, y: 2},

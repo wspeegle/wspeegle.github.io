@@ -7,7 +7,13 @@ ig.module(
 	'game.levels.dorm1',
 	'game.levels.dorm2',
     'game.levels.test1',
-    'game.levels.topdown'
+    'game.levels.topdown',
+    'game.levels.level1',
+    'game.levels.l2',
+    'game.levels.l3',
+    'game.levels.l4',
+    'game.levels.level2'
+
 )
 .defines(function(){
 
@@ -29,11 +35,11 @@ MyGame = ig.Game.extend({
 		// Initialize your game here; bind keys etc.
 
 
-        this.loadLevel(LevelTest1);
+        this.loadLevel(LevelLevel1);
 		ig.music.add('media/sounds/theme1.*');
 		ig.music.volume = .1;
 
-		//ig.music.play();
+		ig.music.play();
 		ig.input.bind(ig.KEY.LEFT_ARROW, 'left');
 		ig.input.bind(ig.KEY.RIGHT_ARROW, 'right');
 		ig.input.bind(ig.KEY.UP_ARROW, 'up');
@@ -135,8 +141,8 @@ MyGame = ig.Game.extend({
 			{
 				this.parent();
 				this.background.draw(0,0);
-				this.mainCharacter.draw(0,0);
-				this.title.draw(ig.system.width - this.title.width, 0);
+				//this.mainCharacter.draw(0,0);
+				//this.title.draw(ig.system.width - this.title.width, 0);
 				var x = ig.system.width/ 2,
 					y = ig.system.height -10;
 				this.instructText.draw('Press Spacebar to Start', x+40, y, ig.Font.ALIGN.CENTER);

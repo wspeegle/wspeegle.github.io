@@ -8,6 +8,7 @@ ig.module(
         EntityLevelexit = ig.Entity.extend({
             _wmDrawBox: true,
             _wmBoxColor: 'rgba(0,0,255,.7)',
+            _wmScalable: true,
             size: {x:15,y:15},
             level: null,
             checkAgainst: ig.Entity.TYPE.A,
@@ -16,7 +17,7 @@ ig.module(
             },
             check: function(other)
             {
-                if(other instanceof EntityPlayer)
+                if(other instanceof EntityPlayer || other instanceof EntityTopplayer)
                 {
                     ig.game.toggleStats(this);
                 }
