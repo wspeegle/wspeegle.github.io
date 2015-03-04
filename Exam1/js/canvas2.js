@@ -14,9 +14,9 @@ function onLoad() {
     var canvas2;
     var context2;
 
-    var renderer = new Renderer('#CAE1FF'); // takes colour for canvas2.
-    var simulation;
-    var ballArray = new Array();
+    var renderer2 = new Renderer('#CAE1FF'); // takes colour for canvas2.
+    var simulation2;
+    var ballArray2 = new Array();
 
     // frameRate Variables.
     var frameRate = 60;
@@ -32,7 +32,7 @@ function onLoad() {
         canvas2 = document.getElementById('canvas2');
 
         //once canvas2 is created, create the simulation passing the width and height of canvas2
-        simulation = new Simulation(canvas2.width,canvas2.height);
+        simulation2 = new Simulation(canvas2.width,canvas2.height);
 
         /*########## Error checking to see if canvas2 is supported ############## */
         if (!canvas2) {
@@ -57,7 +57,7 @@ function onLoad() {
                 y = event.pageY + canvas2.offsetTop;
 
 
-            ballArray.forEach(function(ball)
+            ballArray2.forEach(function(ball)
             {
 
                 var ballX = ball.getX();
@@ -95,10 +95,10 @@ function onLoad() {
         /* Ball takes X | Y | radius | Mass| vX | vY | colour */
 
 
-        ballArray.push(new ball(500, 250, 17, 17, -2, -4,  "#000000"));
-        ballArray.push(new ball(500, 20, 18, 18, -2, 5,  "#000000"));
+        ballArray2.push(new ball(500, 250, 17, 17, -2, -4,  "#000000"));
+        ballArray2.push(new ball(500, 20, 18, 18, -2, 5,  "#000000"));
 
-        ballArray.push(new ball(600, 70, 18, 18, -1, 1,  "#000000"));
+        ballArray2.push(new ball(600, 70, 18, 18, -1, 1,  "#000000"));
 
 
 
@@ -111,8 +111,8 @@ function onLoad() {
         deltaTime = thisTime - lastTime;
 
 
-        renderer.draw(context2, ballArray);
-        simulation.update(context2, deltaTime, ballArray);
+        renderer2.draw(context2, ballArray);
+        simulation2.update(context2, deltaTime, ballArray);
 
         lastTime = thisTime;
 

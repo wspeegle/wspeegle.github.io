@@ -6,7 +6,8 @@ ig.module(
 	'impact.timer',
 	'game.levels.dorm1',
 	'game.levels.dorm2',
-    'game.levels.test1'
+    'game.levels.test1',
+    'game.levels.topdown'
 )
 .defines(function(){
 
@@ -28,7 +29,7 @@ MyGame = ig.Game.extend({
 		// Initialize your game here; bind keys etc.
 
 
-        this.loadLevel(LevelTest1);
+        this.loadLevel(LevelTopdown);
 		ig.music.add('media/sounds/theme1.*');
 		ig.music.volume = .1;
 
@@ -74,7 +75,10 @@ MyGame = ig.Game.extend({
 				this.parent();
 			}
 		}
+        if(this.getEntitiesByType(EntityPlayer)[0])
 		var player = this.getEntitiesByType(EntityPlayer)[0];
+        if(this.getEntitiesByType(EntityTopplayer)[0])
+        var player = this.getEntitiesByType(EntityTopplayer)[0];
 		if(player)
 		{
 			this.screen.x = player.pos.x - ig.system.width/2;

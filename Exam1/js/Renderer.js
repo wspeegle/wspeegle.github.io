@@ -20,12 +20,27 @@ var Renderer = (function (Context) {
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.closePath();
         context.beginPath();
-        context.fillStyle = "#FF0000";
-        context.moveTo(canvas.width/2, 0);
-        context.lineTo(canvas.width/2, canvas.height);
-        context.strokeStyle = "FF0000";
+        context.strokeStyle = "#FF0000";
+        context.lineWidth = 10;
+        context.moveTo(400,0);
+        context.lineTo(800,0);
+        context.lineTo(800,300);
+        context.lineTo(400,300);
         context.stroke();
         context.closePath();
+        context.beginPath();
+        context.strokeStyle = "#000000";
+        context.lineWidth = 10;
+        context.moveTo(0,0);
+        context.lineTo(400,0);
+        context.stroke();
+        context.lineTo(400,300);
+        context.lineTo(0,300);
+        context.lineTo(0,0);
+        context.stroke();
+        context.closePath();
+
+
     }
     function drawBalls(context,ballArray) {
         for (var i = 0; i < ballArray.length; i++) {
@@ -33,7 +48,7 @@ var Renderer = (function (Context) {
             // draw ball using ball objects data.
             context.arc(ballArray[i].getX(), ballArray[i].getY(),ballArray[i].getRadius(), 0, Math.PI * 2, false);
             context.strokeStyle = canvasColour;
-            context.stroke();
+            //context.stroke();
             context.fillStyle = ballArray[i].getColour();
             context.fill();
             context.closePath();

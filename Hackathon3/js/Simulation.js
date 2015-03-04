@@ -191,3 +191,18 @@ var Simulation = (function (Context) {
 
     return Simulation;
 })();
+
+
+function f1()
+{
+
+    console.log('f1 called');
+    for(var i = 0; i <ballArray.length; i++)
+    {
+        if(ballArray[i].getColour() == '#FF0000')
+        {
+            ballArray[i].incScalar();
+            console.log(ballArray[i].getScalar());
+        }
+    }
+}

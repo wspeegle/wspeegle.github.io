@@ -31,6 +31,7 @@ ig.module(
             shootSFX: new ig.Sound('media/sounds/shoot.*'),
             deathSFX: new ig.Sound('media/sounds/death.*'),
             lives: 3,
+            isSwimming: false,
             init: function( x, y, settings ) {
                 this.parent( x, y, settings );
                 this.startPosition = {x:x , y:y};
@@ -50,6 +51,17 @@ ig.module(
             },
             update: function() {
                 // move left or right
+
+                if(this.isSwimming)
+                {
+                    console.log("swimming");
+                    this.gravityFactor = .1;
+                    this.maxVel.x = 50;
+                }else {
+                    this.gravityFactor =1;
+                    this.maxVel.x = 150;
+                }
+
                 var accel = this.standing ? this.accelGround : this.accelAir;
                 if( ig.input.state('left') ) {
                     this.accel.x = -accel;
@@ -216,6 +228,26 @@ ig.module(
                 }else{
                     ig.game.spawnEntity(EntityPlayer, ig.game.respawnPosition.x, ig.game.respawnPosition.y);
                 }
+            },
+            handleMovementTrace: function(res)
+            {
+                var waterTile = 5;
+                if(res.tile.x == waterTile)
+                {
+                    res.collision.x = false;
+                    res.pos.x = this.pos.x +this.vel.x * ig.system.tick;
+                    this.isSwimming = true;
+                }
+                if(res.tile.y == waterTile)
+                {
+                    res.collision.y = false;
+                    res.pos.y = this.pos.y  +this.vel.y * ig.system.tick;
+                    this.isSwimming = true;
+                }else {
+                    console.log("else");
+                    this.isSwimming = false;
+                }
+                this.parent(res);
             }
 
         });
