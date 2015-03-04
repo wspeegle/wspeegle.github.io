@@ -21,7 +21,7 @@ ig.module(
             checkAgainst: ig.Entity.TYPE.NONE,
             collides: ig.Entity.COLLIDES.PASSIVE,
             weapon: 0,
-            totalWeapons: 2,
+            totalWeapons: 3,
             activeWeapon: "EntityBullet",
             startPosition: null,
             invincible: true,
@@ -106,6 +106,19 @@ ig.module(
                             ig.game.spawnEntity(this.activeWeapon, this.pos.x + 15, this.pos.y+7, {flip: this.flip});
                         }
                     }
+                    if(this.activeWeapon == "EntityWMD")
+                    {
+                        if (this.vel.y == 0 && this.flip == true) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x, this.pos.y+13, {flip: this.flip});
+                        } else if (this.vel.y == 0 && this.flip == false) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x + 15, this.pos.y+13, {flip: this.flip});
+                        } else if (this.vel.y != 0 && this.flip == true) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x, this.pos.y+7, {flip: this.flip});
+                        } else if (this.vel.y != 0 && this.flip == false) {
+                            ig.game.spawnEntity(this.activeWeapon, this.pos.x + 15, this.pos.y+7, {flip: this.flip});
+                        }
+                    }
+
 
                 }
                 if( ig.input.pressed('switch') ) {
@@ -118,6 +131,9 @@ ig.module(
                             break;
                         case(1):
                             this.activeWeapon = "EntityGrenade";
+                            break;
+                        case(2):
+                            this.activeWeapon = "EntityWMD";
                             break;
 
                     }
@@ -393,33 +409,33 @@ ig.module(
         EntityWMD = ig.Entity.extend({
             size:{x: 4, y:4},
             offset: {x: 2, y:2},
-            animSheet: new ig.AnimationSheet('media/blood.png', 4,4),
+            animSheet: new ig.AnimationSheet('media/bomb.png', 15,15),
             type: ig.Entity.TYPE.NONE,
             checkAgainst: ig.Entity.TYPE.BOTH,
             collides: ig.Entity.COLLIDES.PASSIVE,
-            maxVel: {x: 200, y: 200},
+            maxVel: {x: 400, y: 200},
             bounciness:.5,
             bounceCounter: 0,
             init: function( x, y, settings ) {
                 this.parent( x + (settings.flip ? -4 : 7), y, settings );
-                this.vel.x = (settings.flip ? -this.maxVel.x : this.maxVel.x);
-                this.vel.y = -(50 + (Math.random()*100));
-                this.addAnim( 'idle', 0.2, [0,1] );
+                this.vel.x = this.accel.x = (settings.flip ? -this.maxVel.x : this.maxVel.x);
+                //this.vel.y = -(50 + (Math.random()*100));
+                this.addAnim( 'idle', 0.2, [0] );
             },
             handleMovementTrace: function( res ) {
                 this.parent( res );
                 if( res.collision.x || res.collision.y ) {
                     // only bounce 3 times
-                    this.bounceCounter++;
-                    if( this.bounceCounter > 3 ) {
+                    //this.bounceCounter++;
+                   // if( this.bounceCounter > 3 ) {
                         this.kill();
-                        ig.game.backgroundMaps[0].setTile(this.pos.x, this.pos.y+10 , 0);
-                        ig.game.collisionMap.setTile(this.pos.x, this.pos.y+10, 0);
-                    }
+                        //ig.game.backgroundMaps[0].setTile(this.pos.x, this.pos.y+10 , 0);
+                       // ig.game.collisionMap.setTile(this.pos.x, this.pos.y+10, 0);
+                    //}
                 }
             },
             check: function( other ) {
-                other.receiveDamage( 10, this );
+                other.receiveDamage( 50, this );
                 this.kill();
             },
             kill:function()

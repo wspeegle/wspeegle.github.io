@@ -1,5 +1,5 @@
 ig.module( 'game.levels.test1' )
-.requires( 'impact.image','game.entities.player','game.entities.zombie','game.entities.sword','game.entities.trigger','game.entities.ladder' )
+.requires( 'impact.image','game.entities.player','game.entities.zombie','game.entities.sword','game.entities.trigger','game.entities.oneup','game.entities.ladder' )
 .defines(function(){
 LevelTest1=/*JSON[*/{
 	"entities": [
@@ -30,6 +30,14 @@ LevelTest1=/*JSON[*/{
 					"x": 12,
 					"y": 12
 				}
+			}
+		},
+		{
+			"type": "EntityOneup",
+			"x": 1140,
+			"y": 532,
+			"settings": {
+				"name": "o1"
 			}
 		},
 		{

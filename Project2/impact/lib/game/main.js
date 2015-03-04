@@ -29,7 +29,7 @@ MyGame = ig.Game.extend({
 		// Initialize your game here; bind keys etc.
 
 
-        this.loadLevel(LevelTopdown);
+        this.loadLevel(LevelTest1);
 		ig.music.add('media/sounds/theme1.*');
 		ig.music.volume = .1;
 
