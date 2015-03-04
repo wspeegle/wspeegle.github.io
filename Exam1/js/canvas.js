@@ -155,7 +155,7 @@ function onLoad() {
         /* Ball takes X | Y | radius | Mass| vX | vY | colour */
 
         ballArray.push(new ball(50, 100, 20, 20, 2, 0,  "#FF0000"));
-        ballArray.push(new ball(200, 100, 20, 20, 2, 0,  "#FF0000"));
+        ballArray.push(new ball(200, 200, 20, 20, 2, 0,  "#FF0000"));
         ballArray.push(new ball(250, 50, 20, 20, 2, 0,  "#FF0000"));
         //ballArray.push(new ball(200, 100, 15, 15, -2, 0,  "#FF0000"));
         //ballArray.push(new ball(250, 50, 12, 12, 0, 5,  "#FF0000"));
