@@ -11,9 +11,25 @@ var tileHeight = 32;
 var pathStart = [worldWidth,worldHeight];
 var pathEnd = [0,0];
 var currentPath = [];
+var lines = [];
 
 function onload()
 {
+
+    var txtFile = new XMLHttpRequest();
+    txtFile.open("GET", "test.txt", true);
+    txtFile.onreadystatechange = function() {
+        if (txtFile.readyState === 4) {  // Makes sure the document is ready to parse.
+            if (txtFile.status === 200) {  // Makes sure it's found the file.
+                allText = txtFile.responseText;
+                lines = txtFile.responseText.split("\n"); // Will separate each line into an array
+            }
+        }
+    }
+
+    txtFile.send(null);
+
+
     console.log('Page loaded.');
     canvas = document.getElementById('gameCanvas');
     canvas.width = worldWidth * tileWidth;
@@ -25,6 +41,7 @@ function onload()
     spritesheet = new Image();
     spritesheet.src = 'images/spritesheet.png';
     spritesheet.onload = loaded;
+
 }
 
 function loaded()
@@ -36,7 +53,13 @@ function loaded()
 
 function createWorld()
 {
+
+
     console.log('Creating world...');
+
+
+    var lineLength = lines[0].split("");
+    //for(var x=0;x < )
 
     // create emptiness
     for (var x=0; x < worldWidth; x++)
@@ -178,8 +201,7 @@ function canvasClick(e)
     redraw();
 }
 
-// world is a 2d array of integers (eg world[10][15] = 0)
-// pathStart and pathEnd are arrays like [5,10]
+
 function findPath(world, pathStart, pathEnd)
 {
     // shortcuts for speed
@@ -439,4 +461,7 @@ function findPath(world, pathStart, pathEnd)
     return calculatePath();
 
 } // end of findPath() function
+
+
+
 
