@@ -4,8 +4,8 @@ var ctx = null;
 var spritesheet = null;
 var spritesheetLoaded = false;
 var world = [[]];
-var worldWidth = 20;
-var worldHeight = 20;
+var worldWidth = 10;
+var worldHeight = 10;
 var tileWidth = 32;
 var tileHeight = 32;
 var pathStart = [];
@@ -89,9 +89,9 @@ function createWorld()
     console.log('Creating world...');
 
     startLoc = [1,1];
-    endLoc = [13,7];
+    endLoc = [8,7];
     pathStart = [1,1];
-    pathEnd = [13,7];
+    pathEnd = [8,7];
 
     // create emptiness
     for (var x=0; x < worldWidth; x++)
@@ -499,7 +499,7 @@ function findPath(world, pathStart, pathEnd)
         // temp integer variables used in the calculations
         var length, max, min, i, j;
         // iterate through the open list until none are left
-
+        console.log("mypathEnd x,y" +mypathEnd.x+ ","+ mypathEnd.y);
         while(length = Open.length)
         {
             max = worldSize;
@@ -517,7 +517,7 @@ function findPath(world, pathStart, pathEnd)
             // is it the destination node?
             //console.log("myNode value: " + myNode.value + " myPathEnd val: " + mypathEnd.value);
             console.log("myNode x,y: " + myNode.x +","+myNode.y);
-            console.log("mypathEnd x,y" +mypathEnd.x+ ","+ mypathEnd.y);
+            //console.log("mypathEnd x,y" +mypathEnd.x+ ","+ mypathEnd.y);
             //if(myNode.value === mypathEnd.value)
             if(myNode.x == mypathEnd.x && myNode.y == mypathEnd.y)
             {
