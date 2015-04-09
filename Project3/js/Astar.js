@@ -12,13 +12,14 @@ var pathStart = [];
 var pathEnd = [];
 var currentPath = [];
 var lines = [];
-//var Closed = [];
+var Closed = [];
 var placeStart = false;
 var placeGoal = false;
 var placeBarrier = false;
 var clearBarrier = false;
 var startLoc = [];
 var endLoc = [];
+var myNeighbors = [];
 
 
 
@@ -223,6 +224,10 @@ function redraw()
 
         }
     }
+    for(var i=0; i<Closed.length; i++)
+    {
+        ctx.drawImage(spritesheet,4*tileWidth,0,tileWidth,tileHeight,Closed[i].x*tileWidth, Closed[i].y*tileHeight, tileWidth, tileHeight);
+    }
 }
 
 // handle click events on the canvas
@@ -290,7 +295,7 @@ function canvasClick(e)
 
     // calculate path
     currentPath = [];
-    currentPath = findPath(world,startLoc,endLoc);
+    currentPath = findPath(world,pathStart,pathEnd);
     console.log("currentpath :" +currentPath);
     redraw();
 }
@@ -482,11 +487,11 @@ function findPath(world, pathStart, pathEnd)
         // list of currently open Nodes
         var Open = [mypathStart];
         // list of closed Nodes
-        var Closed = [];
+        //var Closed = [];
         // list of the final output array
         var result = [];
         // reference to a Node (that is nearby)
-        var myNeighbors;
+        //var myNeighbors;
         // reference to a Node (that we are considering now)
         var myNode;
         // reference to a Node (that starts a path in question)
@@ -510,8 +515,11 @@ function findPath(world, pathStart, pathEnd)
             // grab the next node and remove it from Open array
             myNode = Open.splice(min, 1)[0];
             // is it the destination node?
-
-            if(myNode.value === mypathEnd.value)
+            //console.log("myNode value: " + myNode.value + " myPathEnd val: " + mypathEnd.value);
+            console.log("myNode x,y: " + myNode.x +","+myNode.y);
+            console.log("mypathEnd x,y" +mypathEnd.x+ ","+ mypathEnd.y);
+            //if(myNode.value === mypathEnd.value)
+            if(myNode.x == mypathEnd.x && myNode.y == mypathEnd.y)
             {
                 console.log("entering iffffff");
                 myPath = Closed[Closed.push(myNode) - 1];
@@ -527,17 +535,15 @@ function findPath(world, pathStart, pathEnd)
             }
             else // not the destination
             {
-                console.log("entering elseeeeeeee");
+
                 // find which nearby nodes are walkable
                 myNeighbors = Neighbors(myNode.x, myNode.y);
 
                 // test each one that hasn't been tried already
                 for(i = 0, j = myNeighbors.length; i < j; i++)
                 {
-                    console.log("entering for #: " +i);
+                    //console.log("entering for #: " +i);
                     myPath = Node(myNode, myNeighbors[i]);
-
-
                     if (!AStar[myPath.value])
                     {
                         // estimated cost of this particular route so far
@@ -551,12 +557,12 @@ function findPath(world, pathStart, pathEnd)
                         // mark this node in the world graph as visited
                         AStar[myPath.value] = true;
 
-                        ctx.drawImage(spritesheet,
+                        /*ctx.drawImage(spritesheet,
                             4*tileWidth, 0,
                             tileWidth, tileHeight,
                             myNeighbors[i].x*tileWidth,
                             myNeighbors[i].y*tileHeight,
-                            tileWidth, tileHeight);
+                            tileWidth, tileHeight);*/
 
                         ctx.fillStyle = "blue";
                         ctx.fillText(myPath.g,
