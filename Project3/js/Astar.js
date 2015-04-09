@@ -112,27 +112,8 @@ function createWorld()
     }
     world[1][1] =2;
     world[8][7] = 3;
-    Open = Closed = CurrentPath =[];
-    // scatter some walls
-    /*for (var x=0; x < worldWidth; x++)
-    {
-        for (var y=0; y < worldHeight; y++)
-        {
-            if (Math.random() > 0.75)
-                world[x][y] = 1;
-        }
-    }*/
+    Open = Closed =[];
 
-    // calculate initial possible path
-    // note: unlikely but possible to never find one...
-    //currentPath = [];
-    /*while (currentPath.length == 0)
-    {
-        pathStart = [Math.floor(Math.random()*worldWidth),Math.floor(Math.random()*worldHeight)];
-        pathEnd = [Math.floor(Math.random()*worldWidth),Math.floor(Math.random()*worldHeight)];
-        if (world[pathStart[0]][pathStart[1]] == 0)
-            currentPath = findPath(world,pathStart,pathEnd);
-    }*/
     redraw();
 
 }
@@ -210,7 +191,6 @@ function redraw()
                     break;
                 case 4:
                     spriteNum =4;
-                    console.log("case 4");
                     break;
                 case 5:
                     spriteNum = 5;
@@ -654,23 +634,7 @@ function findPath(world, pathStart, pathEnd)
                         {
                             found = true;
                         }
-                        /*ctx.drawImage(spritesheet,
-                            4*tileWidth, 0,
-                            tileWidth, tileHeight,
-                            myNeighbors[i].x*tileWidth,
-                            myNeighbors[i].y*tileHeight,
-                            tileWidth, tileHeight);*/
 
-                        ctx.fillStyle = "blue";
-                        ctx.fillText(myPath.g,
-                            myNeighbors[i].x * tileWidth + 5,
-                            myNeighbors[i].y * tileHeight + 27);
-                        ctx.fillText(myPath.h,
-                            myNeighbors[i].x * tileWidth + 22,
-                            myNeighbors[i].y * tileHeight + 27);
-                        ctx.fillText(myPath.f,
-                            myNeighbors[i].x * tileWidth + 5,
-                            myNeighbors[i].y * tileHeight + 12);
                     }
 
 
