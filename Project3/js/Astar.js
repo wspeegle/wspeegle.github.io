@@ -21,7 +21,7 @@ var startLoc = [];
 var endLoc = [];
 var myNeighbors = [];
 var Open = [];
-var visited = [];
+
 
 
 
@@ -96,6 +96,9 @@ function createWorld()
 
     pathStart = [1,1];
     pathEnd = [8,7];
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0,0,canvas.width, canvas.height);
 
     // create emptiness
     for (var x=0; x < worldWidth; x++)
@@ -279,13 +282,15 @@ function redraw()
                 break;
         }
         //draw squares for best path
-        /*ctx.drawImage(spritesheet,
-            spriteNum*tileWidth, 0,
-            tileWidth, tileHeight,
-            currentPath[rp][0]*tileWidth,
-            currentPath[rp][1]*tileHeight,
-            tileWidth, tileHeight);
-        ctx.fillStyle = "blue";*/
+        for(var z = 1; z < currentPath.length-1; z++) {
+            ctx.drawImage(spritesheet,
+                12 * tileWidth, 0,
+                tileWidth, tileHeight,
+                currentPath[z][0] * tileWidth,
+                currentPath[z][1] * tileHeight,
+                tileWidth, tileHeight);
+            ctx.fillStyle = "blue";
+        }
         if(currentPath[rp][0] == pathStart[0] && currentPath[rp][1] == pathStart[1])
         {
             //Fill in "G" "H" and "F" in the start square
