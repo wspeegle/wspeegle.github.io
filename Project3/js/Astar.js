@@ -236,17 +236,7 @@ function redraw()
             //ctx.drawImage(spritesheet, 4 * tileWidth, 0, tileWidth, tileHeight, Closed[i].x * tileWidth, Closed[i].y * tileHeight, tileWidth, tileHeight);
             ctx.fillStyle = "blue";
 
-            if (visited[i].x != pathStart[0] && visited[i].y != pathStart[1]) {
-                ctx.fillText(visited[i].g,
-                    visited[i].x * tileWidth + 10,
-                    visited[i].y * tileHeight + 55);
-                ctx.fillText(visited[i].h,
-                    visited[i].x * tileWidth + 45,
-                    visited[i].y * tileHeight + 55);
-                ctx.fillText(visited[i].f,
-                    visited[i].x * tileWidth + 10,
-                    visited[i].y * tileHeight + 15);
-            }
+
             if (visited[i].x == pathStart[0] && visited[i].y == pathStart[1]) {
                 //Fill in "G" "H" and "F" in the start square
                 ctx.fillText("G",
@@ -259,16 +249,15 @@ function redraw()
                     visited[i].x * tileWidth + 10,
                     visited[i].y * tileHeight + 15);
             } else {
-                //Fill in G H F values in all other squares
-                //ctx.fillText(visited[i].g,
-                   // visited[i].x * tileWidth + 10,
-                    //visited[i].y * tileHeight + 55);
-                //ctx.fillText(visited[i].h,
-                    //visited[i].x * tileWidth + 45,
-                    //visited[i].y * tileHeight + 55);
-                //ctx.fillText(visited[i].f,
-                    //visited[i].x * tileWidth + 10,
-                    //visited[i].x * tileHeight + 15);
+                ctx.fillText(visited[i].g,
+                    visited[i].x * tileWidth + 10,
+                    visited[i].y * tileHeight + 55);
+                ctx.fillText(visited[i].h,
+                    visited[i].x * tileWidth + 45,
+                    visited[i].y * tileHeight + 55);
+                ctx.fillText(visited[i].f,
+                    visited[i].x * tileWidth + 10,
+                    visited[i].y * tileHeight + 15);
 
             }
 
@@ -310,19 +299,7 @@ function redraw()
             ctx.fillText("F",
                 currentPath[rp][0]*tileWidth + 10,
                 currentPath[rp][1]*tileHeight +15);
-        }/*else {
-            //Fill in G H F values in all other squares
-            ctx.fillText(currentPath[rp][3],
-                currentPath[rp][0] * tileWidth + 10,
-                currentPath[rp][1] * tileHeight + 55);
-            ctx.fillText(currentPath[rp][4],
-                currentPath[rp][0] * tileWidth + 45,
-                currentPath[rp][1] * tileHeight + 55);
-            ctx.fillText(currentPath[rp][2],
-                currentPath[rp][0] * tileWidth + 10,
-                currentPath[rp][1] * tileHeight + 15);
-
-        }*/
+        }
     }
 
 }
@@ -660,7 +637,7 @@ function findDij(world, pathStart, pathEnd)
                         // estimated cost of entire guessed route to the destination
                        // myPath.f = myPath.g + distanceFunction(myNeighbors[i], mypathEnd);
                         myPath.h = 0;
-                        myPath.f = Math.round((myPath.g + myPath.h)*10) /10;
+                        myPath.f = myPath.g;
                         // remember this new path for testing above
                         Open.push(myPath);
                         visited.push(myPath);
