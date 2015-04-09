@@ -6,8 +6,8 @@ var spritesheetLoaded = false;
 var world = [[]];
 var worldWidth = 10;
 var worldHeight = 10;
-var tileWidth = 32;
-var tileHeight = 32;
+var tileWidth = 64;
+var tileHeight = 64;
 var pathStart = [];
 var pathEnd = [];
 var currentPath = [];
@@ -20,6 +20,8 @@ var clearBarrier = false;
 var startLoc = [];
 var endLoc = [];
 var myNeighbors = [];
+var Open = [];
+var visited = [];
 
 
 
@@ -37,7 +39,7 @@ function onload()
     ctx = canvas.getContext("2d");
     if (!ctx) alert('Hmm!');
     spritesheet = new Image();
-    spritesheet.src = 'images/spritesheet.png';
+    spritesheet.src = 'images/spritesheet2.png';
     spritesheet.onload = loaded;
 
 }
@@ -89,7 +91,9 @@ function createWorld()
     console.log('Creating world...');
 
     startLoc = [1,1];
+
     endLoc = [8,7];
+
     pathStart = [1,1];
     pathEnd = [8,7];
 
@@ -103,7 +107,8 @@ function createWorld()
             world[x][y] = 0;
         }
     }
-
+    world[1][1] =2;
+    world[8][7] = 3;
     // scatter some walls
     /*for (var x=0; x < worldWidth; x++)
     {
@@ -139,7 +144,50 @@ function redraw()
     // clear the screen
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    for(var i=0; i<Closed.length;i++)
+    {
+        var x = Closed[i].x;
+        var y = Closed[i].y;
+        if(Closed.parent != null) {
+            var px = Closed[i].Parent.x;
+            var py = Closed[i].Parent.y;
+        }
+        if(Closed.parent != null)
+        {
+            if(x == pathStart.x && y == pathStart.y) {
+                world[x][y] = 2;
+            }else if(x == pathEnd.x && y == pathEnd.y)
+            {
+                world[x][y] = 3;
+            }else if(x+1 == px && y==py)
+            {
+                world[x][y] = 8;
+            }else if(x+1 == px && y-1 == py)
+            {
+                world[x][y] = 6;
+            }else if(x == px && y-1 == py)
+            {
+                world[x][y] = 10;
+            }else if(x-1 == px && y-1 == py)
+            {
+                world[x][y] = 4;
+            }else if(x-1 ==px && y == py)
+            {
+                world[x][y] = 9;
+            }else if(x-1 == px && y+1 == px)
+            {
+                world[x][y] = 7;
+            }else if(x == px && y+1 == px)
+            {
+                world[x][y] = 11;
+            }else if(x+1 == px && y+1 == px)
+            {
+                world[x][y] = 5;
+            }
 
+        }
+
+    }
     for (var x=0; x < worldWidth; x++)
     {
         for (var y=0; y < worldHeight; y++)
@@ -159,6 +207,28 @@ function redraw()
                     break;
                 case 4:
                     spriteNum =4;
+                    console.log("case 4");
+                    break;
+                case 5:
+                    spriteNum = 5;
+                    break;
+                case 6:
+                    spriteNum = 6;
+                    break;
+                case 7:
+                    spriteNum = 7;
+                    break;
+                case 8:
+                    spriteNum = 8;
+                    break;
+                case 9:
+                    spriteNum = 9;
+                    break;
+                case 10:
+                    spriteNum = 10;
+                    break;
+                case 11:
+                    spriteNum = 11;
                     break;
                 default:
                     spriteNum = 0;
@@ -176,6 +246,22 @@ function redraw()
 
     // draw the path
     console.log('Current path length: '+currentPath.length);
+    for(var i=0; i<Closed.length; i++)
+    {
+
+            //ctx.drawImage(spritesheet, 4 * tileWidth, 0, tileWidth, tileHeight, Closed[i].x * tileWidth, Closed[i].y * tileHeight, tileWidth, tileHeight);
+            ctx.fillStyle = "blue";
+            ctx.fillText(Closed[i].g,
+                Closed[i].x * tileWidth + 5,
+                Closed[i].y * tileHeight + 27);
+            ctx.fillText(Closed[i].h,
+                Closed[i].x * tileWidth + 22,
+                Closed[i].y * tileHeight + 27);
+            ctx.fillText(Closed[i].f,
+                Closed[i].x * tileWidth + 5,
+                Closed[i].y * tileHeight + 12);
+
+    }
     for (rp=0; rp<currentPath.length; rp++)
     {
         switch(currentPath[rp])
@@ -191,13 +277,13 @@ function redraw()
                 break;
         }
         //draw squares for best path
-        ctx.drawImage(spritesheet,
+        /*ctx.drawImage(spritesheet,
             spriteNum*tileWidth, 0,
             tileWidth, tileHeight,
             currentPath[rp][0]*tileWidth,
             currentPath[rp][1]*tileHeight,
             tileWidth, tileHeight);
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = "blue";*/
         if(currentPath[rp][0] == pathStart[0] && currentPath[rp][1] == pathStart[1])
         {
             //Fill in "G" "H" and "F" in the start square
@@ -224,10 +310,7 @@ function redraw()
 
         }
     }
-    for(var i=0; i<Closed.length; i++)
-    {
-        ctx.drawImage(spritesheet,4*tileWidth,0,tileWidth,tileHeight,Closed[i].x*tileWidth, Closed[i].y*tileHeight, tileWidth, tileHeight);
-    }
+
 }
 
 // handle click events on the canvas
@@ -486,7 +569,7 @@ function findPath(world, pathStart, pathEnd)
         // create an array that will contain all world cells
         var AStar = new Array(worldSize);
         // list of currently open Nodes
-        var Open = [mypathStart];
+         Open = [mypathStart];
         // list of closed Nodes
         //var Closed = [];
         // list of the final output array
@@ -501,6 +584,7 @@ function findPath(world, pathStart, pathEnd)
         var length, max, min, i, j;
         // iterate through the open list until none are left
         console.log("mypathEnd x,y" +mypathEnd.x+ ","+ mypathEnd.y);
+        Closed =[];
         while(length = Open.length)
         {
             max = worldSize;
