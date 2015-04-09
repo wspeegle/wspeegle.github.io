@@ -109,6 +109,7 @@ function createWorld()
     }
     world[1][1] =2;
     world[8][7] = 3;
+    Open = Closed = CurrentPath =[];
     // scatter some walls
     /*for (var x=0; x < worldWidth; x++)
     {
@@ -146,46 +147,45 @@ function redraw()
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     for(var i=0; i<Closed.length;i++)
     {
-        var x = Closed[i].x;
-        var y = Closed[i].y;
-        if(Closed.parent != null) {
+        var cx = Closed[i].x;
+        var cy = Closed[i].y;
+        if(Closed[i].hasP) {
+            console.log("px and py: "+px + "," + py);
             var px = Closed[i].Parent.x;
             var py = Closed[i].Parent.y;
         }
-        if(Closed.parent != null)
+        if(Closed[i].hasP)
         {
-            if(x == pathStart.x && y == pathStart.y) {
-                world[x][y] = 2;
-            }else if(x == pathEnd.x && y == pathEnd.y)
+            console.log("if");
+            if(cx+1 == px && cy==py)
             {
-                world[x][y] = 3;
-            }else if(x+1 == px && y==py)
+                world[cx][cy] = 8;
+            }else if(cx+1 == px && cy-1 == py)
             {
-                world[x][y] = 8;
-            }else if(x+1 == px && y-1 == py)
+                world[cx][cy] = 6;
+            }else if(cx == px && cy-1 == py)
             {
-                world[x][y] = 6;
-            }else if(x == px && y-1 == py)
+                world[cx][cy] = 10;
+            }else if(cx-1 == px && cy-1 == py)
             {
-                world[x][y] = 10;
-            }else if(x-1 == px && y-1 == py)
+                world[cx][cy] = 4;
+            }else if(cx-1 ==px && cy == py)
             {
-                world[x][y] = 4;
-            }else if(x-1 ==px && y == py)
+                world[cx][cy] = 9;
+            }else if(cx-1 == px && cy+1 == px)
             {
-                world[x][y] = 9;
-            }else if(x-1 == px && y+1 == px)
+                world[cx][cy] = 7;
+            }else if(cx == px && cy+1 == px)
             {
-                world[x][y] = 7;
-            }else if(x == px && y+1 == px)
+                world[cx][cy] = 11;
+            }else if(cx+1 == px && cy+1 == px)
             {
-                world[x][y] = 11;
-            }else if(x+1 == px && y+1 == px)
-            {
-                world[x][y] = 5;
+                world[cx][cy] = 5;
             }
 
         }
+        world[pathStart[0]][pathStart[1]] = 2;
+        world[pathEnd[0]][pathEnd[1]] = 3;
 
     }
     for (var x=0; x < worldWidth; x++)
@@ -251,15 +251,17 @@ function redraw()
 
             //ctx.drawImage(spritesheet, 4 * tileWidth, 0, tileWidth, tileHeight, Closed[i].x * tileWidth, Closed[i].y * tileHeight, tileWidth, tileHeight);
             ctx.fillStyle = "blue";
+        if(Closed[i].x != pathStart[0] && Closed[i].y != pathStart[1]) {
             ctx.fillText(Closed[i].g,
-                Closed[i].x * tileWidth + 5,
-                Closed[i].y * tileHeight + 27);
+                Closed[i].x * tileWidth + 10,
+                Closed[i].y * tileHeight +55);
             ctx.fillText(Closed[i].h,
-                Closed[i].x * tileWidth + 22,
-                Closed[i].y * tileHeight + 27);
+                Closed[i].x * tileWidth + 45,
+                Closed[i].y * tileHeight + 55);
             ctx.fillText(Closed[i].f,
-                Closed[i].x * tileWidth + 5,
-                Closed[i].y * tileHeight + 12);
+                Closed[i].x * tileWidth + 10,
+                Closed[i].y * tileHeight + 15);
+        }
 
     }
     for (rp=0; rp<currentPath.length; rp++)
@@ -288,25 +290,25 @@ function redraw()
         {
             //Fill in "G" "H" and "F" in the start square
             ctx.fillText("G",
-                currentPath[rp][0]*tileWidth + 5,
-                currentPath[rp][1]*tileHeight +27);
+                currentPath[rp][0]*tileWidth + 10,
+                currentPath[rp][1]*tileHeight +55);
             ctx.fillText("H",
-            currentPath[rp][0]*tileWidth + 20,
-            currentPath[rp][1]*tileHeight +27);
+            currentPath[rp][0]*tileWidth + 45,
+            currentPath[rp][1]*tileHeight +55);
             ctx.fillText("F",
-                currentPath[rp][0]*tileWidth + 5,
-                currentPath[rp][1]*tileHeight +12);
+                currentPath[rp][0]*tileWidth + 10,
+                currentPath[rp][1]*tileHeight +15);
         }else {
             //Fill in G H F values in all other squares
             ctx.fillText(currentPath[rp][3],
-                currentPath[rp][0] * tileWidth + 5,
-                currentPath[rp][1] * tileHeight + 27);
+                currentPath[rp][0] * tileWidth + 10,
+                currentPath[rp][1] * tileHeight + 55);
             ctx.fillText(currentPath[rp][4],
-                currentPath[rp][0] * tileWidth + 15,
-                currentPath[rp][1] * tileHeight + 27);
+                currentPath[rp][0] * tileWidth + 45,
+                currentPath[rp][1] * tileHeight + 55);
             ctx.fillText(currentPath[rp][2],
-                currentPath[rp][0] * tileWidth + 5,
-                currentPath[rp][1] * tileHeight + 12);
+                currentPath[rp][0] * tileWidth + 10,
+                currentPath[rp][1] * tileHeight + 15);
 
         }
     }
@@ -377,8 +379,8 @@ function canvasClick(e)
     pathEnd = cell;*/
 
     // calculate path
-    currentPath = [];
-    currentPath = findPath(world,pathStart,pathEnd);
+    //currentPath = [];
+    //currentPath = findPath(world,pathStart,pathEnd);
     console.log("currentpath :" +currentPath);
     redraw();
 }
@@ -549,7 +551,8 @@ function findPath(world, pathStart, pathEnd)
             // the distanceFunction cost to get
             // from the starting point to this node
             g:0,
-            h: 0
+            h: 0,
+            hasP: false
         };
 
         return newNode;
@@ -629,6 +632,7 @@ function findPath(world, pathStart, pathEnd)
                 {
                     //console.log("entering for #: " +i);
                     myPath = Node(myNode, myNeighbors[i]);
+                    myPath.hasP = true;
                     if (!AStar[myPath.value])
                     {
                         // estimated cost of this particular route so far
