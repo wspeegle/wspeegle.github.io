@@ -165,7 +165,7 @@ function redraw()
                     break;
             }
 
-            ctx.drawImage(spritesheet,
+             ctx.drawImage(spritesheet,
                 spriteNum*tileWidth, 0,
                 tileWidth, tileHeight,
                 x*tileWidth, y*tileHeight,
@@ -326,6 +326,7 @@ function findPath(world, pathStart, pathEnd)
     var	max = Math.max;
     var	pow = Math.pow;
     var	sqrt = Math.sqrt;
+    var found = false;
 
     // the world data are integers:
     // anything higher than this number is considered blocked
@@ -385,7 +386,7 @@ function findPath(world, pathStart, pathEnd)
     {	// diagonals are considered a little farther than cardinal directions
         // diagonal movement using Euclide (AC = sqrt(AB^2 + BC^2))
         // where AB = x2 - x1 and BC = y2 - y1 and AC will be [x3, y3]
-        return Math.round((sqrt(pow(Point.x - Goal.x, 2) + pow(Point.y - Goal.y, 2))));
+        return Math.round((sqrt(pow(Point.x - Goal.x, 2) + pow(Point.y - Goal.y, 2))) *10) /10;
     }
 
     // Neighbors functions, used by findNeighbors function
@@ -444,7 +445,7 @@ function findPath(world, pathStart, pathEnd)
     {
         return ((world[x] != null) &&
         (world[x][y] != null) &&
-        (world[x][y] <= maxWalkableTileNum));
+        (world[x][y] != 1));
     };
 
     // Node function, returns a new object with Node properties
@@ -529,11 +530,11 @@ function findPath(world, pathStart, pathEnd)
                 }
                 while (myPath = myPath.Parent);
                 // clear the working arrays
-                AStar = Closed = Open = [];
+               // AStar = Closed = Open = [];
                 // we want to return start to finish
                 result.reverse();
             }
-            else // not the destination
+            else if(!found)// not the destination
             {
 
                 // find which nearby nodes are walkable
@@ -547,16 +548,19 @@ function findPath(world, pathStart, pathEnd)
                     if (!AStar[myPath.value])
                     {
                         // estimated cost of this particular route so far
-                        myPath.g = myNode.g + distanceFunction(myNeighbors[i], myNode);
+                        myPath.g = Math.round((myNode.g + distanceFunction(myNeighbors[i], myNode))*10) /10;
                         // estimated cost of entire guessed route to the destination
                        // myPath.f = myPath.g + distanceFunction(myNeighbors[i], mypathEnd);
                         myPath.h = ManhattanDistance(myNeighbors[i], mypathEnd);
-                        myPath.f = myPath.g + myPath.h;
+                        myPath.f = Math.round((myPath.g + myPath.h)*10) /10;
                         // remember this new path for testing above
                         Open.push(myPath);
                         // mark this node in the world graph as visited
                         AStar[myPath.value] = true;
-
+                        if (myPath.h == 0)
+                        {
+                            found = true;
+                        }
                         /*ctx.drawImage(spritesheet,
                             4*tileWidth, 0,
                             tileWidth, tileHeight,
@@ -569,7 +573,7 @@ function findPath(world, pathStart, pathEnd)
                             myNeighbors[i].x * tileWidth + 5,
                             myNeighbors[i].y * tileHeight + 27);
                         ctx.fillText(myPath.h,
-                            myNeighbors[i].x * tileWidth + 15,
+                            myNeighbors[i].x * tileWidth + 22,
                             myNeighbors[i].y * tileHeight + 27);
                         ctx.fillText(myPath.f,
                             myNeighbors[i].x * tileWidth + 5,
