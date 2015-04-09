@@ -138,7 +138,7 @@ function redraw()
 
     // clear the screen
     ctx.fillStyle = '#FFFFFF';
-    //ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for (var x=0; x < worldWidth; x++)
     {
@@ -373,7 +373,7 @@ function findPath(world, pathStart, pathEnd)
 
     function ManhattanDistance(Point, Goal)
     {	// linear movement - no diagonals - just cardinal directions (NSEW)
-        return abs(Point.x - Goal.x) + abs(Point.y - Goal.y);
+        return  (abs(Point.x - Goal.x) + abs(Point.y - Goal.y));
     }
 
     function DiagonalDistance(Point, Goal)
@@ -385,7 +385,7 @@ function findPath(world, pathStart, pathEnd)
     {	// diagonals are considered a little farther than cardinal directions
         // diagonal movement using Euclide (AC = sqrt(AB^2 + BC^2))
         // where AB = x2 - x1 and BC = y2 - y1 and AC will be [x3, y3]
-        return Math.ceil(sqrt(pow(Point.x - Goal.x, 2) + pow(Point.y - Goal.y, 2)));
+        return Math.round((sqrt(pow(Point.x - Goal.x, 2) + pow(Point.y - Goal.y, 2))));
     }
 
     // Neighbors functions, used by findNeighbors function
@@ -547,7 +547,7 @@ function findPath(world, pathStart, pathEnd)
                     if (!AStar[myPath.value])
                     {
                         // estimated cost of this particular route so far
-                        myPath.g = myNode.g + Math.round(distanceFunction(myNeighbors[i], myNode));
+                        myPath.g = myNode.g + distanceFunction(myNeighbors[i], myNode);
                         // estimated cost of entire guessed route to the destination
                        // myPath.f = myPath.g + distanceFunction(myNeighbors[i], mypathEnd);
                         myPath.h = ManhattanDistance(myNeighbors[i], mypathEnd);
