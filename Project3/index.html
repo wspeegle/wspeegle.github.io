@@ -7,8 +7,15 @@
 <script type = "text/javascript" src = "js/Astar.js"></script>
 <body onload = "onload()">
 <canvas id= "gameCanvas"></canvas>
+<br>
 <input type = "button" onClick ="createWorld()" value = "New World">
-<input type = "file" id = "fileInput">
+<input type = "button" onClick = "fplaceStart()" value = "Place Start">
+<input type = "button" onClick = "fplaceGoal()" value = "Place Goal">
+<input type = "button" onClick = "fplaceBarrier()" value = "Place Barrier">
+<input type = "button" onClick = "fclearBarrier()" value = "Clear Barrier">
+<input type = "button" onClick = "pathing()" value = "Find Path">
+<input type = "button" onClick = "fdraw()" value = "draw">
+
 <br>
 <pre id = "fileDisplayArea"></pre>
 </body>

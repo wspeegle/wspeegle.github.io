@@ -4,30 +4,27 @@ var ctx = null;
 var spritesheet = null;
 var spritesheetLoaded = false;
 var world = [[]];
-var worldWidth = 16;
-var worldHeight = 16;
+var worldWidth = 20;
+var worldHeight = 20;
 var tileWidth = 32;
 var tileHeight = 32;
-var pathStart = [worldWidth,worldHeight];
-var pathEnd = [0,0];
+var pathStart = [];
+var pathEnd = [];
 var currentPath = [];
 var lines = [];
+//var Closed = [];
+var placeStart = false;
+var placeGoal = false;
+var placeBarrier = false;
+var clearBarrier = false;
+var startLoc = [];
+var endLoc = [];
+
+
+
 
 function onload()
 {
-
-    var txtFile = new XMLHttpRequest();
-    txtFile.open("GET", "test.txt", true);
-    txtFile.onreadystatechange = function() {
-        if (txtFile.readyState === 4) {  // Makes sure the document is ready to parse.
-            if (txtFile.status === 200) {  // Makes sure it's found the file.
-                allText = txtFile.responseText;
-                lines = txtFile.responseText.split("\n"); // Will separate each line into an array
-            }
-        }
-    }
-
-    txtFile.send(null);
 
 
     console.log('Page loaded.');
@@ -51,15 +48,49 @@ function loaded()
     createWorld();
 }
 
+function fplaceStart()
+{
+    placeStart = true;
+    placeGoal = false;
+    placeBarrier = false;
+    clearBarrier = false;
+}
+function fplaceGoal()
+{
+    placeStart = false;
+    placeGoal = true;
+    placeBarrier = false;
+    clearBarrier = false;
+}
+
+function fplaceBarrier()
+{
+    placeStart = false;
+    placeGoal = false;
+    placeBarrier = true;
+    clearBarrier = false;
+}
+
+function fclearBarrier()
+{
+    placeStart = false;
+    placeGoal = false;
+    placeBarrier = false;
+    clearBarrier = true;
+}
+
+
+
 function createWorld()
 {
 
 
     console.log('Creating world...');
 
-
-    var lineLength = lines[0].split("");
-    //for(var x=0;x < )
+    startLoc = [1,1];
+    endLoc = [13,7];
+    pathStart = [1,1];
+    pathEnd = [13,7];
 
     // create emptiness
     for (var x=0; x < worldWidth; x++)
@@ -73,25 +104,25 @@ function createWorld()
     }
 
     // scatter some walls
-    for (var x=0; x < worldWidth; x++)
+    /*for (var x=0; x < worldWidth; x++)
     {
         for (var y=0; y < worldHeight; y++)
         {
             if (Math.random() > 0.75)
                 world[x][y] = 1;
         }
-    }
+    }*/
 
     // calculate initial possible path
     // note: unlikely but possible to never find one...
-    currentPath = [];
-    while (currentPath.length == 0)
+    //currentPath = [];
+    /*while (currentPath.length == 0)
     {
         pathStart = [Math.floor(Math.random()*worldWidth),Math.floor(Math.random()*worldHeight)];
         pathEnd = [Math.floor(Math.random()*worldWidth),Math.floor(Math.random()*worldHeight)];
         if (world[pathStart[0]][pathStart[1]] == 0)
             currentPath = findPath(world,pathStart,pathEnd);
-    }
+    }*/
     redraw();
 
 }
@@ -105,8 +136,8 @@ function redraw()
     var spriteNum = 0;
 
     // clear the screen
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#FFFFFF';
+    //ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for (var x=0; x < worldWidth; x++)
     {
@@ -118,6 +149,15 @@ function redraw()
             {
                 case 1:
                     spriteNum = 1;
+                    break;
+                case 2:
+                    spriteNum = 2;
+                    break;
+                case 3:
+                    spriteNum = 3;
+                    break;
+                case 4:
+                    spriteNum =4;
                     break;
                 default:
                     spriteNum = 0;
@@ -137,7 +177,7 @@ function redraw()
     console.log('Current path length: '+currentPath.length);
     for (rp=0; rp<currentPath.length; rp++)
     {
-        switch(rp)
+        switch(currentPath[rp])
         {
             case 0:
                 spriteNum = 2; // start
@@ -149,13 +189,39 @@ function redraw()
                 spriteNum = 4; // path node
                 break;
         }
-
+        //draw squares for best path
         ctx.drawImage(spritesheet,
             spriteNum*tileWidth, 0,
             tileWidth, tileHeight,
             currentPath[rp][0]*tileWidth,
             currentPath[rp][1]*tileHeight,
             tileWidth, tileHeight);
+        ctx.fillStyle = "blue";
+        if(currentPath[rp][0] == pathStart[0] && currentPath[rp][1] == pathStart[1])
+        {
+            //Fill in "G" "H" and "F" in the start square
+            ctx.fillText("G",
+                currentPath[rp][0]*tileWidth + 5,
+                currentPath[rp][1]*tileHeight +27);
+            ctx.fillText("H",
+            currentPath[rp][0]*tileWidth + 20,
+            currentPath[rp][1]*tileHeight +27);
+            ctx.fillText("F",
+                currentPath[rp][0]*tileWidth + 5,
+                currentPath[rp][1]*tileHeight +12);
+        }else {
+            //Fill in G H F values in all other squares
+            ctx.fillText(currentPath[rp][3],
+                currentPath[rp][0] * tileWidth + 5,
+                currentPath[rp][1] * tileHeight + 27);
+            ctx.fillText(currentPath[rp][4],
+                currentPath[rp][0] * tileWidth + 15,
+                currentPath[rp][1] * tileHeight + 27);
+            ctx.fillText(currentPath[rp][2],
+                currentPath[rp][0] * tileWidth + 5,
+                currentPath[rp][1] * tileHeight + 12);
+
+        }
     }
 }
 
@@ -193,17 +259,63 @@ function canvasClick(e)
     // now we know while tile we clicked
     console.log('we clicked tile '+cell[0]+','+cell[1]);
 
-    pathStart = pathEnd;
-    pathEnd = cell;
+
+    if(placeStart)
+    {
+        world[startLoc[0]][startLoc[1]] = 0;
+        world[cell[0]][cell[1]] = 2;
+        pathStart = cell;
+        //startLoc = endLoc;
+        startLoc = cell;
+       // console.log("world" + world[cell[0]][cell[1]]);
+       // console.log("Path start" +pathStart);
+    }else if(placeGoal)
+    {
+        world[endLoc[0]][endLoc[1]] = 0;
+        world[cell[0]][cell[1]] = 3;
+        pathEnd = cell;
+        endLoc = cell;
+       // console.log("Path end" + pathEnd);
+    }else if(placeBarrier)
+    {
+        world[cell[0]][cell[1]] = 1;
+    }else
+    {
+        world[cell[0]][cell[1]] = 0;
+    }
+
+
+    /*pathStart = pathEnd;
+    pathEnd = cell;*/
 
     // calculate path
+    currentPath = [];
+    currentPath = findPath(world,startLoc,endLoc);
+    console.log("currentpath :" +currentPath);
+    redraw();
+}
+function fdraw()
+{
+    redraw();
+}
+function pathing()
+{
+    console.log("pathing...");
+    currentPath = [];
+    console.log("post");
+
     currentPath = findPath(world,pathStart,pathEnd);
+
+
+
+    //currentPath = findPath(world,startLoc, endLoc);
+    //console.log(currentPath);
     redraw();
 }
 
-
 function findPath(world, pathStart, pathEnd)
 {
+    console.log("finding path from start: " + pathStart[0] + "," + pathStart[1] + " to " +pathEnd[0] + "," +pathEnd[1]);
     // shortcuts for speed
     var	abs = Math.abs;
     var	max = Math.max;
@@ -226,30 +338,30 @@ function findPath(world, pathStart, pathEnd)
 
     // which heuristic should we use?
     // default: no diagonals (Manhattan)
-    var distanceFunction = ManhattanDistance;
-    var findNeighbors = function(){}; // empty
+    //var distanceFunction = ManhattanDistance;
+    //var findNeighbors = function(){}; // empty
 
-    /*
+
 
      // alternate heuristics, depending on your game:
 
      // diagonals allowed but no sqeezing through cracks:
-     var distanceFunction = DiagonalDistance;
-     var findNeighbors = DiagonalNeighbors;
+    // var distanceFunction = DiagonalDistance;
+    // var findNeighbors = DiagonalNeighbors;
 
      // diagonals and squeezing through cracks allowed:
-     var distanceFunction = DiagonalDistance;
-     var findNeighbors = DiagonalNeighborsFree;
+     //var distanceFunction = DiagonalDistance;
+     //var findNeighbors = DiagonalNeighborsFree;
 
      // euclidean but no squeezing through cracks:
      var distanceFunction = EuclideanDistance;
      var findNeighbors = DiagonalNeighbors;
 
      // euclidean and squeezing through cracks allowed:
-     var distanceFunction = EuclideanDistance;
-     var findNeighbors = DiagonalNeighborsFree;
+     //var distanceFunction = EuclideanDistance;
+    // var findNeighbors = DiagonalNeighborsFree;
 
-     */
+
 
     // distanceFunction functions
     // these return how far away a point is to another
@@ -268,7 +380,7 @@ function findPath(world, pathStart, pathEnd)
     {	// diagonals are considered a little farther than cardinal directions
         // diagonal movement using Euclide (AC = sqrt(AB^2 + BC^2))
         // where AB = x2 - x1 and BC = y2 - y1 and AC will be [x3, y3]
-        return sqrt(pow(Point.x - Goal.x, 2) + pow(Point.y - Goal.y, 2));
+        return Math.ceil(sqrt(pow(Point.x - Goal.x, 2) + pow(Point.y - Goal.y, 2)));
     }
 
     // Neighbors functions, used by findNeighbors function
@@ -321,30 +433,6 @@ function findPath(world, pathStart, pathEnd)
         }
     }
 
-    // returns every available North East, South East,
-    // South West or North West cell including the times that
-    // you would be squeezing through a "crack"
-    function DiagonalNeighborsFree(myN, myS, myE, myW, N, S, E, W, result)
-    {
-        myN = N > -1;
-        myS = S < worldHeight;
-        myE = E < worldWidth;
-        myW = W > -1;
-        if(myE)
-        {
-            if(myN && canWalkHere(E, N))
-                result.push({x:E, y:N});
-            if(myS && canWalkHere(E, S))
-                result.push({x:E, y:S});
-        }
-        if(myW)
-        {
-            if(myN && canWalkHere(W, N))
-                result.push({x:W, y:N});
-            if(myS && canWalkHere(W, S))
-                result.push({x:W, y:S});
-        }
-    }
 
     // returns boolean value (world cell is available and open)
     function canWalkHere(x, y)
@@ -371,7 +459,8 @@ function findPath(world, pathStart, pathEnd)
             f:0,
             // the distanceFunction cost to get
             // from the starting point to this node
-            g:0
+            g:0,
+            h: 0
         };
 
         return newNode;
@@ -380,7 +469,12 @@ function findPath(world, pathStart, pathEnd)
     // Path function, executes AStar algorithm operations
     function calculatePath()
     {
+        console.log("enter calc path");
         // create Nodes from the Start and End x,y coordinates
+        console.log("pathstart " +pathStart[0] +","+ pathStart[1] );
+        console.log("pathend " +pathEnd[0] + ","+ pathEnd[1] );
+
+
         var	mypathStart = Node(null, {x:pathStart[0], y:pathStart[1]});
         var mypathEnd = Node(null, {x:pathEnd[0], y:pathEnd[1]});
         // create an array that will contain all world cells
@@ -400,6 +494,7 @@ function findPath(world, pathStart, pathEnd)
         // temp integer variables used in the calculations
         var length, max, min, i, j;
         // iterate through the open list until none are left
+
         while(length = Open.length)
         {
             max = worldSize;
@@ -415,12 +510,14 @@ function findPath(world, pathStart, pathEnd)
             // grab the next node and remove it from Open array
             myNode = Open.splice(min, 1)[0];
             // is it the destination node?
+
             if(myNode.value === mypathEnd.value)
             {
+                console.log("entering iffffff");
                 myPath = Closed[Closed.push(myNode) - 1];
                 do
                 {
-                    result.push([myPath.x, myPath.y]);
+                    result.push([myPath.x, myPath.y, myPath.f, myPath.g, myPath.h]);
                 }
                 while (myPath = myPath.Parent);
                 // clear the working arrays
@@ -430,29 +527,59 @@ function findPath(world, pathStart, pathEnd)
             }
             else // not the destination
             {
+                console.log("entering elseeeeeeee");
                 // find which nearby nodes are walkable
                 myNeighbors = Neighbors(myNode.x, myNode.y);
+
                 // test each one that hasn't been tried already
                 for(i = 0, j = myNeighbors.length; i < j; i++)
                 {
+                    console.log("entering for #: " +i);
                     myPath = Node(myNode, myNeighbors[i]);
+
+
                     if (!AStar[myPath.value])
                     {
                         // estimated cost of this particular route so far
-                        myPath.g = myNode.g + distanceFunction(myNeighbors[i], myNode);
+                        myPath.g = myNode.g + Math.round(distanceFunction(myNeighbors[i], myNode));
                         // estimated cost of entire guessed route to the destination
-                        myPath.f = myPath.g + distanceFunction(myNeighbors[i], mypathEnd);
+                       // myPath.f = myPath.g + distanceFunction(myNeighbors[i], mypathEnd);
+                        myPath.h = ManhattanDistance(myNeighbors[i], mypathEnd);
+                        myPath.f = myPath.g + myPath.h;
                         // remember this new path for testing above
                         Open.push(myPath);
                         // mark this node in the world graph as visited
                         AStar[myPath.value] = true;
+
+                        ctx.drawImage(spritesheet,
+                            4*tileWidth, 0,
+                            tileWidth, tileHeight,
+                            myNeighbors[i].x*tileWidth,
+                            myNeighbors[i].y*tileHeight,
+                            tileWidth, tileHeight);
+
+                        ctx.fillStyle = "blue";
+                        ctx.fillText(myPath.g,
+                            myNeighbors[i].x * tileWidth + 5,
+                            myNeighbors[i].y * tileHeight + 27);
+                        ctx.fillText(myPath.h,
+                            myNeighbors[i].x * tileWidth + 15,
+                            myNeighbors[i].y * tileHeight + 27);
+                        ctx.fillText(myPath.f,
+                            myNeighbors[i].x * tileWidth + 5,
+                            myNeighbors[i].y * tileHeight + 12);
                     }
+
+
                 }
                 // remember this route as having no more untested options
                 Closed.push(myNode);
+
             }
         } // keep iterating until the Open list is empty
+        console.log("exit calc");
         return result;
+
     }
 
     // actually calculate the a-star path!
