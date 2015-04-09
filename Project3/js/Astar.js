@@ -21,6 +21,7 @@ var startLoc = [];
 var endLoc = [];
 var myNeighbors = [];
 var Open = [];
+var visited = [];
 
 
 
@@ -112,7 +113,7 @@ function createWorld()
     }
     world[1][1] =2;
     world[8][7] = 3;
-    Open = Closed =[];
+    Open = Closed = currentPath = visited = [];
 
     redraw();
 
@@ -129,16 +130,16 @@ function redraw()
     // clear the screen
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    for(var i=0; i<Closed.length;i++)
+    for(var i=0; i<visited.length;i++)
     {
-        var cx = Closed[i].x;
-        var cy = Closed[i].y;
-        if(Closed[i].hasP) {
+        var cx = visited[i].x;
+        var cy = visited[i].y;
+        if(visited[i].hasP) {
             console.log("px and py: "+px + "," + py);
-            var px = Closed[i].Parent.x;
-            var py = Closed[i].Parent.y;
+            var px = visited[i].Parent.x;
+            var py = visited[i].Parent.y;
         }
-        if(Closed[i].hasP)
+        if(visited[i].hasP)
         {
             console.log("if");
             if(cx+1 == px && cy==py)
@@ -229,21 +230,47 @@ function redraw()
 
     // draw the path
     console.log('Current path length: '+currentPath.length);
-    for(var i=0; i<Closed.length; i++)
+    for(var i=0; i<visited.length; i++)
     {
 
             //ctx.drawImage(spritesheet, 4 * tileWidth, 0, tileWidth, tileHeight, Closed[i].x * tileWidth, Closed[i].y * tileHeight, tileWidth, tileHeight);
             ctx.fillStyle = "blue";
-        if(Closed[i].x != pathStart[0] && Closed[i].y != pathStart[1]) {
-            ctx.fillText(Closed[i].g,
-                Closed[i].x * tileWidth + 10,
-                Closed[i].y * tileHeight +55);
-            ctx.fillText(Closed[i].h,
-                Closed[i].x * tileWidth + 45,
-                Closed[i].y * tileHeight + 55);
-            ctx.fillText(Closed[i].f,
-                Closed[i].x * tileWidth + 10,
-                Closed[i].y * tileHeight + 15);
+        if(visited[i]!= null) {
+            if (visited[i].x != pathStart[0] && visited[i].y != pathStart[1]) {
+                ctx.fillText(visited[i].g,
+                    visited[i].x * tileWidth + 10,
+                    visited[i].y * tileHeight + 55);
+                ctx.fillText(visited[i].h,
+                    visited[i].x * tileWidth + 45,
+                    visited[i].y * tileHeight + 55);
+                ctx.fillText(visited[i].f,
+                    visited[i].x * tileWidth + 10,
+                    visited[i].y * tileHeight + 15);
+            }
+            if (visited[i].x == pathStart[0] && visited[i].y == pathStart[1]) {
+                //Fill in "G" "H" and "F" in the start square
+                ctx.fillText("G",
+                    visited[i].x * tileWidth + 10,
+                    visited[i].y * tileHeight + 55);
+                ctx.fillText("H",
+                    visited[i].x * tileWidth + 45,
+                    visited[i].y * tileHeight + 55);
+                ctx.fillText("F",
+                    visited[i].x * tileWidth + 10,
+                    visited[i].y * tileHeight + 15);
+            } else {
+                //Fill in G H F values in all other squares
+                ctx.fillText(visited[i].g,
+                    visited[i].x * tileWidth + 10,
+                    visited[i].y * tileHeight + 55);
+                ctx.fillText(visited[i].h,
+                    visited[i].x * tileWidth + 45,
+                    visited[i].y * tileHeight + 55);
+                ctx.fillText(visited[i].f,
+                    visited[i].x * tileWidth + 10,
+                    visited[i].x * tileHeight + 15);
+
+            }
         }
 
     }
@@ -283,7 +310,7 @@ function redraw()
             ctx.fillText("F",
                 currentPath[rp][0]*tileWidth + 10,
                 currentPath[rp][1]*tileHeight +15);
-        }else {
+        }/*else {
             //Fill in G H F values in all other squares
             ctx.fillText(currentPath[rp][3],
                 currentPath[rp][0] * tileWidth + 10,
@@ -295,7 +322,7 @@ function redraw()
                 currentPath[rp][0] * tileWidth + 10,
                 currentPath[rp][1] * tileHeight + 15);
 
-        }
+        }*/
     }
 
 }
@@ -573,6 +600,7 @@ function findPath(world, pathStart, pathEnd)
         // iterate through the open list until none are left
         console.log("mypathEnd x,y" +mypathEnd.x+ ","+ mypathEnd.y);
         Closed =[];
+        visited = [];
         while(length = Open.length)
         {
             max = worldSize;
@@ -617,6 +645,7 @@ function findPath(world, pathStart, pathEnd)
                 {
                     //console.log("entering for #: " +i);
                     myPath = Node(myNode, myNeighbors[i]);
+
                     myPath.hasP = true;
                     if (!AStar[myPath.value])
                     {
@@ -628,6 +657,7 @@ function findPath(world, pathStart, pathEnd)
                         myPath.f = Math.round((myPath.g + myPath.h)*10) /10;
                         // remember this new path for testing above
                         Open.push(myPath);
+                        visited.push(myPath);
                         // mark this node in the world graph as visited
                         AStar[myPath.value] = true;
                         if (myPath.h == 0)

@@ -21,7 +21,7 @@ ig.module(
             checkAgainst: ig.Entity.TYPE.NONE,
             collides: ig.Entity.COLLIDES.PASSIVE,
             weapon: 0,
-            totalWeapons: 2,
+            totalWeapons: 3,
             activeWeapon: "EntityBullet",
             startPosition: null,
             invincible: true,
@@ -32,7 +32,7 @@ ig.module(
             deathSFX: new ig.Sound('media/sounds/death.*'),
             lives: 3,
             isSwimming: false,
-            canFly: false,
+            canFly: true,
             init: function( x, y, settings ) {
                 this.parent( x, y, settings );
                 this.startPosition = {x:x , y:y};
